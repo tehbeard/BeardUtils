@@ -1,4 +1,4 @@
-package me.tehbeard.utils;
+package me.tehbeard.utils.addons;
 /**
  * Provides a way to initialise a class
  * @author james

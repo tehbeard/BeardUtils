@@ -1,4 +1,4 @@
-package me.tehbeard.utils;
+package me.tehbeard.utils.addons;
 
 import java.io.File;
 import java.io.FilenameFilter;
