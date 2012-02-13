@@ -64,6 +64,11 @@ public class ConfigurableFactory<T> {
         return null;
     }
 
+    /**
+     * Parser to read annotations from products
+     * @author james
+     *
+     */
     public abstract class Parser{
         /**
          * Return the tag code for a class
