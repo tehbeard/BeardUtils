@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import me.tehbeard.utils.addons.ClassBootStrapper;
+import me.tehbeard.utils.addons.ClassNameProvider;
+
 
 /**
  * Represents a generic addon loader 
