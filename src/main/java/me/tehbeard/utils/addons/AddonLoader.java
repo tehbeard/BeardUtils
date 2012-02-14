@@ -11,15 +11,13 @@ import java.util.List;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import me.tehbeard.utils.addons.ClassBootStrapper;
-import me.tehbeard.utils.addons.ClassNameProvider;
 
 
 /**
  * Represents a generic addon loader 
  * An addon loader must be for a specific type of class
  */
-public class AddonLoader<T> {
+public abstract class AddonLoader<T> {
 
     /**
      * Directory addons are located under
@@ -27,18 +25,6 @@ public class AddonLoader<T> {
      */
     private File dir;
     private URLClassLoader loader;
-    /**
-     * class name provider for this addon loader,
-     * This is responsible for finding the name of classes to load,
-     * and can made work in partnership with the boot strapper for
-     * dependency resolution 
-     */
-    private ClassNameProvider classNameProvider;
-    
-    /**
-     * class boot strapper, this will be responsible for loading the classes
-     */
-    private ClassBootStrapper<T> classBootStraper;
     private Class<T> addonClass;
     /**
      * 
@@ -86,13 +72,9 @@ public class AddonLoader<T> {
 
             try {
                 addon = new ZipFile(addonFile);
-                if(classNameProvider != null){
-                    classList.addAll(classNameProvider.getClassList(addon));
-                }
-                else
-                {
-                    throw new IllegalStateException("class name provider not started.");
-                }
+
+                classList.addAll(getClassList(addon));
+
                 loader = new URLClassLoader(urls,getClass().getClassLoader());
 
                 for(String t :classList){
@@ -101,7 +83,7 @@ public class AddonLoader<T> {
                         if(c!=null && addonClass.isAssignableFrom(c) ){
                             @SuppressWarnings("unchecked")
                             Class<T> tc = (Class<T>) c;
-                            classBootStraper.makeClass(tc);
+                            makeClass(tc);
                         }
                     } catch (ClassNotFoundException e) {
                         System.out.println("Could not find class! " + t);
@@ -120,19 +102,11 @@ public class AddonLoader<T> {
     }
 
     /**
-     * Sets the boot strapper for this loader
-     * @param boot boot strapper to use
+     * Makes a class of classType
+     * @param classType
      */
-    public void setBootStrap(ClassBootStrapper<T> boot){
-        classBootStraper = boot;
-    }
+    public abstract void makeClass(Class<? extends T> classType);
 
-    /**
-     * Sets the class name provider for this addon loader
-     * @param provider
-     */
-    public void setClassNameProvider(ClassNameProvider provider){
-        classNameProvider = provider;
-    }
+    public abstract List<String> getClassList(ZipFile file);
 
 }

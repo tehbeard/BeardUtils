@@ -7,21 +7,20 @@ import java.util.Map;
 
 /**
  * Represents a factory for various classes
- * Any item placed into the factory
+ * Any item placed into the factory must have an annotation
  * @author james
  *
  * @param <T>
  */
-public class ConfigurableFactory<T> {
+public abstract class ConfigurableFactory<T> {
     private Map<String,Class<? extends T>> products;
     private Class<Annotation> annotation;
-    private Parser parser;
+    
     /**
      * Constructs a new Configurable factory
      */
-    public ConfigurableFactory(Class<Annotation> annotation,Parser parser){
+    public ConfigurableFactory(Class<Annotation> annotation){
         this.annotation = annotation;
-        this.parser = parser;
         products = new HashMap<String, Class<? extends T>>();
     }
 
@@ -33,7 +32,7 @@ public class ConfigurableFactory<T> {
     public boolean addProduct(Class<? extends T> product){
         Annotation tag = product.getAnnotation(annotation);
         if(tag!=null){
-            String t = parser.getTag(tag);
+            String t = getTag(tag);
             if(t!=null){
                 products.put(t,product);
                 return true;
@@ -65,16 +64,10 @@ public class ConfigurableFactory<T> {
     }
 
     /**
-     * Parser to read annotations from products
-     * @author james
-     *
+     * Return the tag code for a class
+     * @param annotation annotation to parse
+     * @return
      */
-    public abstract class Parser{
-        /**
-         * Return the tag code for a class
-         * @param annotation annotation to parse
-         * @return
-         */
-        public abstract String getTag(Annotation annotation);
-    }
+    public abstract String getTag(Annotation annotation);
+
 }
