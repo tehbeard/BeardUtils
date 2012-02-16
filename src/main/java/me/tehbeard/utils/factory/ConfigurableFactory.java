@@ -10,10 +10,10 @@ import java.util.Map;
  * Any item placed into the factory must have an annotation
  * @author james
  *
- * @param <T>
+ * @param <C>
  */
-public abstract class ConfigurableFactory<T> {
-    private Map<String,Class<? extends T>> products;
+public abstract class ConfigurableFactory<C,A> {
+    private Map<String,Class<? extends C>> products;
     private Class<? extends Annotation> annotation;
     
     /**
@@ -21,7 +21,7 @@ public abstract class ConfigurableFactory<T> {
      */
     public ConfigurableFactory(Class<? extends Annotation> annotation){
         this.annotation = annotation;
-        products = new HashMap<String, Class<? extends T>>();
+        products = new HashMap<String, Class<? extends C>>();
     }
 
     /**
@@ -29,10 +29,10 @@ public abstract class ConfigurableFactory<T> {
      * @param product product to add to the factory
      * @return wether it was added or not
      */
-    public boolean addProduct(Class<? extends T> product){
+    public boolean addProduct(Class<? extends C> product){
         Annotation tag = product.getAnnotation(annotation);
         if(tag!=null){
-            String t = getTag(tag);
+            String t = getTag((A) tag);
             if(t!=null){
                 products.put(t,product);
                 return true;
@@ -48,10 +48,10 @@ public abstract class ConfigurableFactory<T> {
      * @return an instance of the product, or null if not found
      * @throws IllegalStateException
      */
-    public T getProduct(String tag)throws IllegalStateException{
+    public C getProduct(String tag)throws IllegalStateException{
         if(products.containsKey(tag)){
             try {
-                T object = products.get(tag).newInstance();
+                C object = products.get(tag).newInstance();
                 return object;
             } catch (InstantiationException e) {
                 throw new IllegalStateException("Could not initialise instance of the object");
@@ -68,6 +68,6 @@ public abstract class ConfigurableFactory<T> {
      * @param annotation annotation to parse
      * @return
      */
-    public abstract String getTag(Annotation annotation);
+    public abstract String getTag(A annotation);
 
 }
