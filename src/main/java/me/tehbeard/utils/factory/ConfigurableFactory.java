@@ -14,12 +14,12 @@ import java.util.Map;
  */
 public abstract class ConfigurableFactory<T> {
     private Map<String,Class<? extends T>> products;
-    private Class<Annotation> annotation;
+    private Class<? extends Annotation> annotation;
     
     /**
      * Constructs a new Configurable factory
      */
-    public ConfigurableFactory(Class<Annotation> annotation){
+    public ConfigurableFactory(Class<? extends Annotation> annotation){
         this.annotation = annotation;
         products = new HashMap<String, Class<? extends T>>();
     }
