@@ -15,7 +15,7 @@ import java.util.Map;
 public abstract class ConfigurableFactory<C,A> {
     private Map<String,Class<? extends C>> products;
     private Class<? extends Annotation> annotation;
-    
+
     /**
      * Constructs a new Configurable factory
      */
@@ -29,15 +29,15 @@ public abstract class ConfigurableFactory<C,A> {
      * @param product product to add to the factory
      * @return wether it was added or not
      */
+    @SuppressWarnings("unchecked")
     public boolean addProduct(Class<? extends C> product){
         Annotation tag = product.getAnnotation(annotation);
         if(tag!=null){
-            String t = getTag((A) tag);
-            if(t!=null){
-                products.put(t,product);
-                return true;
-            }
-
+                String t = getTag(((A) tag));
+                if(t!=null){
+                    products.put(t,product);
+                    return true;
+                }
         }
         return false;
     }
