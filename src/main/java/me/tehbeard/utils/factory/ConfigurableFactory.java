@@ -54,9 +54,9 @@ public abstract class ConfigurableFactory<C,A> {
                 C object = products.get(tag).newInstance();
                 return object;
             } catch (InstantiationException e) {
-                throw new IllegalStateException("Could not initialise instance of the object");
+                throw new IllegalStateException("Could not create instance of the object");
             } catch (IllegalAccessException e) {
-                throw new IllegalStateException("Could not initialise instance of the object due to an access exception");
+                throw new IllegalStateException("Could not create instance of the object due to an access exception");
 
             }	
         }
@@ -66,7 +66,7 @@ public abstract class ConfigurableFactory<C,A> {
     /**
      * Return the tag code for a class
      * @param annotation annotation to parse
-     * @return
+     * @return tag to be used for getting this object, or null if not found
      */
     public abstract String getTag(A annotation);
 
