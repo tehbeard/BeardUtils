@@ -21,6 +21,13 @@ package me.tehbeard.utils.map;
  * original McRegion files.
  *
  */
+
+/*
+ * 2012 Febuary 18
+ * 
+ * Modified to be non static
+ * 
+ */
  
 // A simple cache and wrapper for efficiently multiple RegionFiles simultaneously.
  
@@ -30,15 +37,15 @@ import java.util.*;
  
 public class RegionFileCache {
  
-    private static final int MAX_CACHE_SIZE = 256;
+    private final int MAX_CACHE_SIZE = 256;
  
  
-    private static final Map<File, Reference<RegionFile>> cache = new HashMap<File, Reference<RegionFile>>();
+    private final Map<File, Reference<RegionFile>> cache = new HashMap<File, Reference<RegionFile>>();
  
-    private RegionFileCache() {
+    public RegionFileCache() {
     }
  
-    public static synchronized RegionFile getRegionFile(File basePath, int chunkX, int chunkZ) {
+    public synchronized RegionFile getRegionFile(File basePath, int chunkX, int chunkZ) {
         File regionDir = new File(basePath, "region");
         File file = new File(regionDir, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mcr");
  
@@ -53,7 +60,7 @@ public class RegionFileCache {
         }
  
         if (cache.size() >= MAX_CACHE_SIZE) {
-            RegionFileCache.clear();
+            clear();
         }
  
         RegionFile reg = new RegionFile(file);
@@ -61,7 +68,7 @@ public class RegionFileCache {
         return reg;
     }
  
-    public static synchronized void clear() {
+    public synchronized void clear() {
         for (Reference<RegionFile> ref : cache.values()) {
             try {
                 if (ref.get() != null) {
@@ -74,17 +81,17 @@ public class RegionFileCache {
         cache.clear();
     }
  
-    public static int getSizeDelta(File basePath, int chunkX, int chunkZ) {
+    public int getSizeDelta(File basePath, int chunkX, int chunkZ) {
         RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
         return r.getSizeDelta();
     }
  
-    public static DataInputStream getChunkDataInputStream(File basePath, int chunkX, int chunkZ) {
+    public DataInputStream getChunkDataInputStream(File basePath, int chunkX, int chunkZ) {
         RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
         return r.getChunkDataInputStream(chunkX & 31, chunkZ & 31);
     }
  
-    public static DataOutputStream getChunkDataOutputStream(File basePath, int chunkX, int chunkZ) {
+    public DataOutputStream getChunkDataOutputStream(File basePath, int chunkX, int chunkZ) {
         RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
         return r.getChunkDataOutputStream(chunkX & 31, chunkZ & 31);
     }
