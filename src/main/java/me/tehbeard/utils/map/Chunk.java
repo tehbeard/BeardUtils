@@ -1,6 +1,15 @@
 package me.tehbeard.utils.map;
 
+import java.io.DataOutput;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import me.tehbeard.utils.map.tileEntities.TileEntity;
+
 import com.mojang.nbt.CompoundTag;
+import com.mojang.nbt.ListTag;
+import com.mojang.nbt.NbtIo;
 import com.mojang.nbt.Tag;
 
 
@@ -33,82 +42,132 @@ import com.mojang.nbt.Tag;
  */
 public class Chunk {
 
-	private final CompoundTag chunk;
+	int xPos,zPos;
+	byte[] Biomes;
+	byte[] HeightMap;
+	Section[] sections;
+	List<TileEntity> tileEntities;
 	
+	public final CompoundTag chunk;
+
 	public Chunk(CompoundTag chunk){
 		this.chunk = chunk;
 	}
-	public byte getBiome(int x, int z) {
-		return chunk.getByteArray("Biomes")[(z*16)+4];
-	}
+	
 
-	public byte getBlockData(int x, int y, int z) {
-		return readDataLayer(x, y, z, "Data");
-	}
-
-	public int getBlockEmittedLight(int x, int y, int z) {
-		return readDataLayer(x, y, z, "BlockLight");
-	}
-
-	public int getBlockSkyLight(int x, int y, int z) {
-		// TODO Auto-generated method stub
-		return readDataLayer(x, y, z, "SkyLight");
-	}
-
-	public int getBlockTypeId(int x, int y, int z) {
-		// TODO Auto-generated method stub
-		CompoundTag section = getSection(y/16);
-		if(section!=null){
-			return section.getByteArray("Blocks")[(y << 8) | (z << 4) | x];
-		}
-		
-		return 0;
-	}
-
-	public int getHighestBlockYAt(int x, int z) {
-		return chunk.getByteArray("HeightMap")[z*16+x];
-	}
-
-	public double getRawBiomeRainfall(int x, int z) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public double getRawBiomeTemperature(int x, int z) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public int getX() {
-		return chunk.getInt("xPos");
-	}
-
-	public int getZ() {
-		return chunk.getInt("zPos");
-	}
 
 	
-	private CompoundTag getSection(int y){
-			
-		//find the section
-		for(Tag tag : chunk.getCompound("Sections").getAllTags()){
-			if(((CompoundTag)tag).getInt("Y") == y){
-				return (CompoundTag)tag;
+	private class Section{
+		byte Y;
+		byte[] Blocks;//4096
+		DataLayer AddBlocks;
+		DataLayer Data;
+		DataLayer SkyLight;
+		DataLayer BlockLight;//2048
+		
+		private DataLayer getLayer(byte[] data){
+			return new DataLayer(data.length >0? data : new byte[2048],4);
+		}
+		
+		Section(CompoundTag tag){
+			Y = tag.getByte("Y");
+			Blocks     = tag.getByteArray("Blocks");
+			AddBlocks  = getLayer(tag.getByteArray("AddBlocks") );
+			Data       = getLayer(tag.getByteArray("Data")      );
+			SkyLight   = getLayer(tag.getByteArray("SkyLight")  );
+			BlockLight = getLayer(tag.getByteArray("BlockLight"));
+		}
+		
+		public int getBlockId(int x,int y,int z){
+			if(
+					((x >=0 && x<16)&&
+					(y >=0 && y<16)&&
+					(z >=0 && z<16)) == false
+					){
+				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
 			}
-		}
-		return null;
-	}
-	
-	private byte readDataLayer(int x, int y, int z,String layer){
-		byte data = 0;
-		int localY = y % 16;
-		CompoundTag section = getSection(y/16);
-		if(section!=null){
-			data = (byte) (new DataLayer(chunk.getByteArray(layer), 4)).get(x, localY, z);
+			return (AddBlocks.get(x, y, z) <<8) | Blocks[(y << 8) | (z << 4) | x];
 		}
 		
-		return data;
+		public int getData(int x,int y,int z){
+			if(
+					((x >=0 && x<16)&&
+					(y >=0 && y<16)&&
+					(z >=0 && z<16)) == false
+					){
+				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
+			}
+			return Data.get(x,y,z);
+		}
+		
+		public int getSkyLight(int x,int y,int z){
+			if(
+					((x >=0 && x<16)&&
+					(y >=0 && y<16)&&
+					(z >=0 && z<16)) == false
+					){
+				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
+			}
+			return SkyLight.get(x,y,z);
+		}
+		
+		public int getBlockLight(int x,int y,int z){
+			if(
+					((x >=0 && x<16)&&
+					(y >=0 && y<16)&&
+					(z >=0 && z<16)) == false
+					){
+				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
+			}
+			return BlockLight.get(x,y,z);
+		}
+		
+		//setters
+		public void setBlockId(int x,int y,int z,int val){
+			if(
+					((x >=0 && x<16)&&
+					(y >=0 && y<16)&&
+					(z >=0 && z<16)) == false
+					){
+				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
+			}
+			AddBlocks.set(x, y, z,val >>8);
+			Blocks[(y << 8) | (z << 4) | x] = (byte) (val % 256); 
+		}
+		
+		public void setData(int x,int y,int z,int val){
+			if(
+					((x >=0 && x<16)&&
+					(y >=0 && y<16)&&
+					(z >=0 && z<16)) == false
+					){
+				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
+			}
+			Data.set(x,y,z,val);
+		}
+		
+		public void setSkyLight(int x,int y,int z,int val){
+			if(
+					((x >=0 && x<16)&&
+					(y >=0 && y<16)&&
+					(z >=0 && z<16)) == false
+					){
+				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
+			}
+			SkyLight.set(x,y,z,val);
+		}
+		
+		public void setBlockLight(int x,int y,int z,int val){
+			if(
+					((x >=0 && x<16)&&
+					(y >=0 && y<16)&&
+					(z >=0 && z<16)) == false
+					){
+				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
+			}
+			BlockLight.set(x,y,z,val);
+		}
+		
 	}
-
 	
 }

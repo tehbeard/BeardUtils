@@ -1,10 +1,6 @@
 package me.tehbeard.utils.schematic;
 
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
 import me.tehbeard.utils.map.tileEntities.TileEntity;
 
 import org.bukkit.Bukkit;
@@ -31,9 +27,8 @@ public class BukkitDelayedSchematicLoader {
 		}
 		//lay out the area
 		for(int layer = 0;layer<3;layer++){
-			for(int y=0;y<schematic.getHeight();y+=2){
+			for(int y=0;y<schematic.getHeight();y+=4){
 				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,new runner(schematic,l,layer,y) , count);
-				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,new runner(schematic,l,layer,y+1) , count+1);
 				count += 5L;
 			}
 		}
@@ -59,16 +54,24 @@ public class BukkitDelayedSchematicLoader {
 		private Schematic sch;
 		private Location l;
 		private int layer;
-		private int y;
+		private int ys;
 
 		
 		public runner(Schematic sch,Location l,int layer,int y){
 			this.sch = sch;
 			this.l = l;
 			this.layer = layer;
-			this.y = y;
+			this.ys = y;
 		}
 		public void run() {
+			makeLayer(ys);
+			makeLayer(ys+1);
+			makeLayer(ys+2);
+			makeLayer(ys+3);
+
+		}
+		
+		private void makeLayer(int y){
 			if(y<sch.getHeight()){
 				for(int z = 0;z<sch.getLength();z++){
 					for(int x = 0;x<sch.getWidth();x++){
@@ -82,7 +85,6 @@ public class BukkitDelayedSchematicLoader {
 				}
 			}
 			System.out.println("layer done y: " + y + " type: " + layer);
-
 		}
 
 	}

@@ -65,7 +65,7 @@ import java.util.zip.*;
 public class RegionFile {
 
     public static final String ANVIL_EXTENSION = ".mca";
-    public static final String MCREGION_EXTENSION = ".mcr";
+
 
     private static final int VERSION_GZIP = 1;
     private static final int VERSION_DEFLATE = 2;
@@ -164,7 +164,7 @@ public class RegionFile {
 
     // various small debug printing helpers
     private void debug(String in) {
-//        System.out.print(in);
+        //System.out.print(in);
     }
 
     private void debugln(String in) {
@@ -196,7 +196,7 @@ public class RegionFile {
         try {
             int offset = getOffset(x, z);
             if (offset == 0) {
-                // debugln("READ", x, z, "miss");
+                debugln("READ", x, z, "miss");
                 return null;
             }
 
@@ -221,13 +221,13 @@ public class RegionFile {
                 byte[] data = new byte[length - 1];
                 file.read(data);
                 DataInputStream ret = new DataInputStream(new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(data))));
-                // debug("READ", x, z, " = found");
+                debug("READ", x, z, " = found");
                 return ret;
             } else if (version == VERSION_DEFLATE) {
                 byte[] data = new byte[length - 1];
                 file.read(data);
                 DataInputStream ret = new DataInputStream(new BufferedInputStream(new InflaterInputStream(new ByteArrayInputStream(data))));
-                // debug("READ", x, z, " = found");
+                debug("READ", x, z, " = found");
                 return ret;
             }
 

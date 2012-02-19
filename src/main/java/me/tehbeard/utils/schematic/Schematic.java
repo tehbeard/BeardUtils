@@ -69,28 +69,13 @@ public class Schematic {
 				" height: " + height +
 				" length: " +length);
 		//prepare the factory
-		ConfigurableFactory<TileEntity, TileEntityType> tileEntityFactory = new ConfigurableFactory<TileEntity, TileEntityType>(TileEntityType.class) {
-
-			@Override
-			public String getTag(TileEntityType annotation) {
-				System.out.println(annotation.id());
-				return annotation.id();
-			}
-		};
-		tileEntityFactory.addProduct(TileSign.class);
-		tileEntityFactory.addProduct(TileTrap.class);
-		tileEntityFactory.addProduct(TileChest.class);
-		tileEntityFactory.addProduct(TileFurnace.class);
-		tileEntityFactory.addProduct(TileRecordPlayer.class);
-		tileEntityFactory.addProduct(TileNoteBlock.class);
-		tileEntityFactory.addProduct(TileSpawner.class);
-		tileEntityFactory.addProduct(TileCauldron.class);
+		
 		
 		ListTag<CompoundTag> tileEntityTag = (ListTag<CompoundTag>) tag.getList("TileEntities");
 
 		for(int i = 0 ; i< tileEntityTag.size();i++){
 			CompoundTag tileEntity = tileEntityTag.get(i);
-			TileEntity t = tileEntityFactory.getProduct(tileEntity.getString("id"));
+			TileEntity t = TileEntityFactory.getInstance().getProduct(tileEntity.getString("id"));
 			if(t!=null){
 				t.setData(tileEntity);
 				//System.out.println(t.toString());

@@ -47,7 +47,7 @@ public class RegionFileCache {
  
     public synchronized RegionFile getRegionFile(File basePath, int chunkX, int chunkZ) {
         File regionDir = new File(basePath, "region");
-        File file = new File(regionDir, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mcr");
+        File file = new File(regionDir, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
  
         Reference<RegionFile> ref = cache.get(file);
  
