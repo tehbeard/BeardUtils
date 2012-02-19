@@ -123,9 +123,12 @@ public class Chunk {
 				){
 			throw new IllegalArgumentException("Out of Bounds" + lx + ","+ y + ","+ lz);
 		}
-		if(sections[(int) Math.floor(y/16)]!=null){
-			sections[(int) Math.floor(y/16)].setBlockId(lx, y%16, lz,id);
+		
+		if(sections[(int) Math.floor(y/16)]==null){
+			sections[(int) Math.floor(y/16)] = new Section((int) Math.floor(y/16));
 		}
+		
+		 sections[(int) Math.floor(y/16)].setBlockId(lx, y%16, lz,id);
 	}
 
 	public int getBlockData(int x,int y,int z){
@@ -159,6 +162,18 @@ public class Chunk {
 		}
 	}
 
+	public int getHeighestBlock(int x,int z){
+		int lx = x - (xPos * 16);
+		int lz = z - (zPos * 16);
+		if(
+				((lx >=0 && lx<16)&&
+				(lz >=0 && lz<16)) == false
+				){
+			throw new IllegalArgumentException("Out of Bounds" + lx + ","+ lz);
+		}
+		return HeightMap[lz << 4 | lx];
+	}
+	
 	private class Section{
 		byte Y;
 		byte[] Blocks;//4096
@@ -334,13 +349,10 @@ public class Chunk {
 
 		c.write(null);
 
-		for(int y=255;y>-1;y--){
-			if(c.getBlockId(x , y, z)==123){
-				c.setBlockId(x , y, z,(byte) 124);
-			}
-			System.out.print(c.getBlockId(x , y, z)  + (c.getBlockData(x , y, z) == 0 ? "" : ":" +c.getBlockData(x , y, z) )+",");
-
-			if(y % 32==0){System.out.println();}
+		for(int y=250;y>-1;y--){
+			
+				c.setBlockId(x , y, z,(byte) 20);
+			
 		}
 		
 		DataOutputStream out = cache.getChunkDataOutputStream(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\New World"), chunkX, chunkZ);
@@ -352,7 +364,7 @@ public class Chunk {
 		else
 		{
 			System.out.println("Outfile not found");
-		}
+		}/**/
 
 
 	}
