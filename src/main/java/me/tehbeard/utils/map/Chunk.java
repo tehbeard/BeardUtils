@@ -1,11 +1,16 @@
 package me.tehbeard.utils.map;
 
+import java.io.DataInputStream;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import me.tehbeard.utils.map.tileEntities.TileEntity;
+import me.tehbeard.utils.map.tileEntities.TileEntityFactory;
 
 import com.mojang.nbt.CompoundTag;
 import com.mojang.nbt.ListTag;
@@ -44,19 +49,116 @@ public class Chunk {
 
 	int xPos,zPos;
 	byte[] Biomes;
-	byte[] HeightMap;
+	int[] HeightMap;
 	Section[] sections;
 	List<TileEntity> tileEntities;
-	
-	public final CompoundTag chunk;
+
 
 	public Chunk(CompoundTag chunk){
-		this.chunk = chunk;
+		xPos = chunk.getInt("xPos");
+		zPos = chunk.getInt("zPos");
+		Biomes = chunk.getByteArray("Biomes").length > 0 ? chunk.getByteArray("Biomes") : new byte[256];
+		HeightMap = chunk.getIntArray("HeightMap").length > 0 ? chunk.getIntArray("HeightMap") : new int[256];
+
+		//load sections
+		ListTag<CompoundTag> sectionsTag = (ListTag<CompoundTag>) chunk.getList("Sections");
+		sections = new Section[16];
+		for(CompoundTag section: sectionsTag){
+			sections[section.getByte("Y")] = new Section(section);
+		}
+
+		//load tile entities
+		tileEntities = new ArrayList<TileEntity>();
+		ListTag<CompoundTag> TileEntitytag = (ListTag<CompoundTag>) chunk.getList("TileEntities");
+		for(CompoundTag tileEntity : TileEntitytag){
+			TileEntity t = TileEntityFactory.getInstance().getProduct(tileEntity.getString("id"));
+			if(t!=null){
+				t.setData(tileEntity);
+				//System.out.println(t.toString());
+				tileEntities.add(t);
+			}
+			else
+			{
+				System.out.println("Could not load entity " + tileEntity.getString("id"));
+			}
+		}
+
+		//load Actual Entities
+		//TODO
+	}
+
+
+	public int getX(){
+		return xPos;
+	}
+
+	public int getZ(){
+		return zPos;
+	}
+
+
+	public int getBlockId(int x,int y,int z){
+		int lx = x - (xPos * 16);
+		int lz = z - (zPos * 16);
+		if(
+				((lx >=0 && lx<16)&&
+						(y >=0 && y<256)&&
+						(lz >=0 && lz<16)) == false
+				){
+			throw new IllegalArgumentException("Out of Bounds" + lx + ","+ y + ","+ lz);
+		}
+		if(sections[(int) Math.floor(y/16)]!=null){
+			return sections[(int) Math.floor(y/16)].getBlockId(lx, y%16, lz);
+		}
+		return 0;
 	}
 	
+	public void setBlockId(int x,int y,int z,int id){
+		int lx = x - (xPos * 16);
+		int lz = z - (zPos * 16);
+		if(
+				((lx >=0 && lx<16)&&
+						(y >=0 && y<256)&&
+						(lz >=0 && lz<16)) == false
+				){
+			throw new IllegalArgumentException("Out of Bounds" + lx + ","+ y + ","+ lz);
+		}
+		if(sections[(int) Math.floor(y/16)]!=null){
+			sections[(int) Math.floor(y/16)].setBlockId(lx, y%16, lz,id);
+		}
+	}
 
+	public int getBlockData(int x,int y,int z){
+		int lx = x - (xPos * 16);
+		int lz = z - (zPos * 16);
+		if(
+				((lx >=0 && lx<16)&&
+						(y >=0 && y<256)&&
+						(lz >=0 && lz<16)) == false
+				){
+			throw new IllegalArgumentException("Out of Bounds" + lx + ","+ y + ","+ lz);
+		}
+		if(sections[(int) Math.floor(y/16)]!=null){
+			return sections[(int) Math.floor(y/16)].getData(lx, y%16, lz);
+		}
+		return 0;
+	}
 
-	
+	public void setBlockData(int x,int y,int z,byte data){
+		int lx = x - (xPos * 16);
+		int lz = z - (zPos * 16);
+		if(
+				((lx >=0 && lx<16)&&
+						(y >=0 && y<256)&&
+						(lz >=0 && lz<16)) == false
+				){
+			throw new IllegalArgumentException("Out of Bounds" + lx + ","+ y + ","+ lz);
+		}
+		if(sections[(int) Math.floor(y/16)]!=null){
+			sections[(int) Math.floor(y/16)].setData(lx, y%16, lz,data);
+		}
+	}
+
 	private class Section{
 		byte Y;
 		byte[] Blocks;//4096
@@ -64,12 +166,22 @@ public class Chunk {
 		DataLayer Data;
 		DataLayer SkyLight;
 		DataLayer BlockLight;//2048
-		
+
 		private DataLayer getLayer(byte[] data){
 			return new DataLayer(data.length >0? data : new byte[2048],4);
 		}
-		
+
+		Section(int Y){
+			this.Y = (byte) Y;
+			Blocks     = new byte[4096];
+			AddBlocks  = new DataLayer(new byte[2048],4);
+			Data       = new DataLayer(new byte[2048],4);
+			SkyLight   = new DataLayer(new byte[2048],4);
+			BlockLight = new DataLayer(new byte[2048],4);
+		}
+
 		Section(CompoundTag tag){
+
 			Y = tag.getByte("Y");
 			Blocks     = tag.getByteArray("Blocks");
 			AddBlocks  = getLayer(tag.getByteArray("AddBlocks") );
@@ -77,97 +189,173 @@ public class Chunk {
 			SkyLight   = getLayer(tag.getByteArray("SkyLight")  );
 			BlockLight = getLayer(tag.getByteArray("BlockLight"));
 		}
-		
+
+		public int getY(){
+			return Y;
+		}
+
 		public int getBlockId(int x,int y,int z){
 			if(
 					((x >=0 && x<16)&&
-					(y >=0 && y<16)&&
-					(z >=0 && z<16)) == false
+							(y >=0 && y<16)&&
+							(z >=0 && z<16)) == false
 					){
 				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
 			}
 			return (AddBlocks.get(x, y, z) <<8) | Blocks[(y << 8) | (z << 4) | x];
 		}
-		
+
 		public int getData(int x,int y,int z){
 			if(
 					((x >=0 && x<16)&&
-					(y >=0 && y<16)&&
-					(z >=0 && z<16)) == false
+							(y >=0 && y<16)&&
+							(z >=0 && z<16)) == false
 					){
 				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
 			}
 			return Data.get(x,y,z);
 		}
-		
+
 		public int getSkyLight(int x,int y,int z){
 			if(
 					((x >=0 && x<16)&&
-					(y >=0 && y<16)&&
-					(z >=0 && z<16)) == false
+							(y >=0 && y<16)&&
+							(z >=0 && z<16)) == false
 					){
 				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
 			}
 			return SkyLight.get(x,y,z);
 		}
-		
+
 		public int getBlockLight(int x,int y,int z){
 			if(
 					((x >=0 && x<16)&&
-					(y >=0 && y<16)&&
-					(z >=0 && z<16)) == false
+							(y >=0 && y<16)&&
+							(z >=0 && z<16)) == false
 					){
 				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
 			}
 			return BlockLight.get(x,y,z);
 		}
-		
+
 		//setters
 		public void setBlockId(int x,int y,int z,int val){
 			if(
 					((x >=0 && x<16)&&
-					(y >=0 && y<16)&&
-					(z >=0 && z<16)) == false
+							(y >=0 && y<16)&&
+							(z >=0 && z<16)) == false
 					){
 				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
 			}
 			AddBlocks.set(x, y, z,val >>8);
 			Blocks[(y << 8) | (z << 4) | x] = (byte) (val % 256); 
 		}
-		
+
 		public void setData(int x,int y,int z,int val){
 			if(
 					((x >=0 && x<16)&&
-					(y >=0 && y<16)&&
-					(z >=0 && z<16)) == false
+							(y >=0 && y<16)&&
+							(z >=0 && z<16)) == false
 					){
 				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
 			}
 			Data.set(x,y,z,val);
 		}
-		
+
 		public void setSkyLight(int x,int y,int z,int val){
 			if(
 					((x >=0 && x<16)&&
-					(y >=0 && y<16)&&
-					(z >=0 && z<16)) == false
+							(y >=0 && y<16)&&
+							(z >=0 && z<16)) == false
 					){
 				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
 			}
 			SkyLight.set(x,y,z,val);
 		}
-		
+
 		public void setBlockLight(int x,int y,int z,int val){
 			if(
 					((x >=0 && x<16)&&
-					(y >=0 && y<16)&&
-					(z >=0 && z<16)) == false
+							(y >=0 && y<16)&&
+							(z >=0 && z<16)) == false
 					){
 				throw new IllegalArgumentException("Out of Bounds" + x + ","+ y + ","+ z);
 			}
 			BlockLight.set(x,y,z,val);
 		}
-		
+
+		public CompoundTag getTag(){
+			CompoundTag tag = new CompoundTag();
+			tag.putByte("Y",Y);
+			tag.putByteArray("Blocks",Blocks);
+			tag.putByteArray("AddBlocks",AddBlocks.data); 
+			tag.putByteArray("Data",Data.data);
+			tag.putByteArray("SkyLight",SkyLight.data);
+			tag.putByteArray("BlockLight",BlockLight.data);
+			return tag;
+		}
+
 	}
-	
+
+	public void write(DataOutputStream os) throws IOException{
+
+		CompoundTag level = new CompoundTag("Level");
+		level.putInt("xPos",xPos);
+		level.putInt("zPos",zPos);
+		level.putByteArray("Biomes",Biomes);
+		level.putIntArray("HeightMap",HeightMap);
+
+		ListTag<CompoundTag> sectionsTag = new ListTag<CompoundTag>();
+		for(Section s :sections){
+			if(s!=null){
+				sectionsTag.add(s.getTag());
+			}
+		}
+		level.put("Sections",sectionsTag);
+
+		//wrap and write
+		CompoundTag out = new CompoundTag();
+		out.putCompound("Level", level);
+		out.print(System.out);
+		if(os!=null){
+			NbtIo.write(out, os);
+		}
+	}
+
+	public static void main(String[] args) throws IOException{
+		RegionFileCache cache = new RegionFileCache();
+		int x = -242;
+		int z = 280;
+		int chunkX = (int)Math.floor((double)x / 16);
+		int chunkZ = (int)Math.floor((double)z / 16);
+		DataInputStream in = cache.getChunkDataInputStream(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\New World"), chunkX, chunkZ);
+		Chunk c = new Chunk(NbtIo.read(in).getCompound("Level"));
+		in.close();
+
+		c.write(null);
+
+		for(int y=255;y>-1;y--){
+			if(c.getBlockId(x , y, z)==123){
+				c.setBlockId(x , y, z,(byte) 124);
+			}
+			System.out.print(c.getBlockId(x , y, z)  + (c.getBlockData(x , y, z) == 0 ? "" : ":" +c.getBlockData(x , y, z) )+",");
+
+			if(y % 32==0){System.out.println();}
+		}
+		
+		DataOutputStream out = cache.getChunkDataOutputStream(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\New World"), chunkX, chunkZ);
+		if(out!=null){
+			c.write(out);
+			out.close();
+			cache.clear();
+		}
+		else
+		{
+			System.out.println("Outfile not found");
+		}
+
+
+	}
+
+
 }

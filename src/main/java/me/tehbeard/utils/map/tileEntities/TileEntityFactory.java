@@ -11,7 +11,6 @@ public class TileEntityFactory {
 
 			@Override
 			public String getTag(TileEntityType annotation) {
-				System.out.println(annotation.id());
 				return annotation.id();
 			}
 		};

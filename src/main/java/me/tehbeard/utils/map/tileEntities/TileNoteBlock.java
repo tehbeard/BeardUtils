@@ -2,9 +2,7 @@ package me.tehbeard.utils.map.tileEntities;
 
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Jukebox;
 import org.bukkit.block.NoteBlock;
 
 import com.mojang.nbt.CompoundTag;

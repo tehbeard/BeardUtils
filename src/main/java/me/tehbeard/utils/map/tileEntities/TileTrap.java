@@ -1,19 +1,15 @@
 package me.tehbeard.utils.map.tileEntities;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Dispenser;
-import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import com.mojang.nbt.CompoundTag;
 import com.mojang.nbt.ListTag;
-import com.mojang.nbt.Tag;
 
 
 @TileEntityType(id="Trap")

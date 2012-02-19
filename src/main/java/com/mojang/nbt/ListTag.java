@@ -9,7 +9,7 @@ package com.mojang.nbt;
 import java.io.*;
 import java.util.*;
 
-public class ListTag<T extends Tag> extends Tag {
+public class ListTag<T extends Tag> extends Tag implements Iterable<T> {
     private List<T> list = new ArrayList<T>();
     private byte type;
 
@@ -99,5 +99,9 @@ public class ListTag<T extends Tag> extends Tag {
         }
         return false;
     }
+
+	public Iterator<T> iterator() {
+		return list.iterator();
+	}
 
 }

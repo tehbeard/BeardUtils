@@ -73,8 +73,8 @@ public class Schematic {
 		
 		ListTag<CompoundTag> tileEntityTag = (ListTag<CompoundTag>) tag.getList("TileEntities");
 
-		for(int i = 0 ; i< tileEntityTag.size();i++){
-			CompoundTag tileEntity = tileEntityTag.get(i);
+		for(CompoundTag tileEntity  :tileEntityTag){
+			
 			TileEntity t = TileEntityFactory.getInstance().getProduct(tileEntity.getString("id"));
 			if(t!=null){
 				t.setData(tileEntity);
