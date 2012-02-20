@@ -6,13 +6,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.tehbeard.utils.factory.ConfigurableFactory;
 import me.tehbeard.utils.map.tileEntities.*;
 
 import com.mojang.nbt.CompoundTag;
 import com.mojang.nbt.ListTag;
 import com.mojang.nbt.NbtIo;
-import com.mojang.nbt.Tag;
 
 /**
  * Provides a way to access and manipulate .schematic files
