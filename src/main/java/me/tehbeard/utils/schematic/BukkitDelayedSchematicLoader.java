@@ -29,7 +29,7 @@ public class BukkitDelayedSchematicLoader {
 		for(int layer = 0;layer<3;layer++){
 			for(int y=0;y<schematic.getHeight();y+=4){
 				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,new runner(schematic,l,layer,y) , count);
-				count += 5L;
+				count += 1L;
 			}
 		}
 
