@@ -1,6 +1,8 @@
 package me.tehbeard.utils.commands;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +26,8 @@ public class ArgumentPack {
     public ArgumentPack(String[] boolFlags,String[] flagOpts,String rawArguments){
         //initialise
         strArgs = new ArrayList<String>();
-
-
+        this.boolFlags = new HashSet<String>();
+        this.flagOptions = new HashMap<String, String>();
         System.out.println(rawArguments);
         boolean inQuotes = false;
         StringBuilder token = new StringBuilder();
@@ -64,13 +66,14 @@ public class ArgumentPack {
             String tok = it.next();
             //check if it's a potential option (optFlag off, starts with -
             if(tok.startsWith("-")){
-                String t = tok.replace("-","");
+                String t = tok.substring(1);
                 if(inArray(boolFlags, t)){
                     this.boolFlags.add(t);
                     continue;
                 }
                 if(inArray(flagOpts, t)){
                     if(it.hasNext()){
+                        l(t);
                         this.flagOptions.put(t, it.next());
                     }
                     continue;
@@ -93,10 +96,14 @@ public class ArgumentPack {
     }
 
     public static void main(String[] args){
-        String arg = "hello \"world trees\" this is a \"test of the argument pack.\"";
-        ArgumentPack pack = new ArgumentPack(new String[0], new String[0],arg);
+        String arg = "hello \"world trees\" this -a -b is a -c \"test of the argument pack.\"";
+        String[] bool = {"a"};
+        String[] opt = {"b","c"};
+        ArgumentPack pack = new ArgumentPack(bool, opt,arg);
 
         l(pack.strArgs.toString());
+        l(pack.boolFlags.toString());
+        l(pack.flagOptions.toString());
     }
     public static void l(String l){
         System.out.println(l);
