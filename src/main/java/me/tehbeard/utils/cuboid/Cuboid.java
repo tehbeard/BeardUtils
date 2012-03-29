@@ -26,7 +26,7 @@ public class Cuboid {
 	}
 
 	public void setCuboid(String line){
-		String[] l = line.split(":");
+		String[] l = line.split(",");
 		world=l[0];
 		v1 = new Vector(
 				Math.min(Integer.parseInt(l[1]),Integer.parseInt(l[4])), 
