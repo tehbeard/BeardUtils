@@ -95,17 +95,32 @@ public class ArgumentPack {
 
     }
 
+    public boolean getFlag(String flag){
+        return boolFlags.contains(flag);
+    }
+    
+    public String getOption(String flag){
+        return flagOptions.get(flag); 
+    }
+    
+    public int size(){
+        return strArgs.size();
+    }
+    
+    public String get(int index){
+        return strArgs.get(index);
+    }
     public static void main(String[] args){
         String arg = "hello \"world trees\" this -a -b is a -c \"test of the argument pack.\"";
         String[] bool = {"a"};
         String[] opt = {"b","c"};
         ArgumentPack pack = new ArgumentPack(bool, opt,arg);
 
-        l(pack.strArgs.toString());
-        l(pack.boolFlags.toString());
-        l(pack.flagOptions.toString());
+        System.out.println(pack.strArgs.toString());
+        System.out.println(pack.boolFlags.toString());
+        System.out.println(pack.flagOptions.toString());
     }
-    public static void l(String l){
-        System.out.println(l);
+    private static void l(String l){
+        //System.out.println(l);
     }
 }
