@@ -21,11 +21,11 @@ public class BukkitDelayedSchematicLoader {
 		long count =1L;
 		
 		//clear the area
-		for(int y=schematic.getHeight();y>=0;y--){
+		/*for(int y=schematic.getHeight();y>=0;y--){
 			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,new clearer(schematic,l,y) , count);
 			count += 5L;
-		}
-		//lay out the area
+		}*/
+		//lay out the area  
 		for(int layer = 0;layer<3;layer++){
 			for(int y=0;y<schematic.getHeight();y+=4){
 				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,new runner(schematic,l,layer,y) , count);
@@ -105,8 +105,8 @@ public class BukkitDelayedSchematicLoader {
 				for(int z = 0;z<sch.getLength();z++){
 					for(int x = 0;x<sch.getWidth();x++){
 
-							l.getWorld().getBlockAt(l.getBlockX() + x, l.getBlockY() + y, l.getBlockZ() + z).setTypeIdAndData(0,(byte)0,false);
-							l.getWorld().getBlockAt(l.getBlockX() + x, l.getBlockY() + y, l.getBlockZ() + z).getState().update();
+							l.getWorld().getBlockAt(l.getBlockX() + x, /*l.getBlockY() +*/ y, l.getBlockZ() + z).setTypeIdAndData(0,(byte)0,false);
+							l.getWorld().getBlockAt(l.getBlockX() + x, /*l.getBlockY() +*/ + y, l.getBlockZ() + z).getState().update();
 						}
 
 					}

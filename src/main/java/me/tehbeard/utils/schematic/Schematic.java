@@ -78,7 +78,7 @@ public class Schematic {
 			TileEntity t = TileEntityFactory.getInstance().getProduct(tileEntity.getString("id"));
 			if(t!=null){
 				t.setData(tileEntity);
-				//System.out.println(t.toString());
+				System.out.println(t.toString());
 				this.tileEntities.add(t);
 			}
 			else
@@ -90,7 +90,7 @@ public class Schematic {
 
 	public int getBlockId(int x,int y,int z){
 
-		int index =  y * width *length + z * width + x;
+		int index =  (y * width * length) + (z * width) + x;
 		if(index < 0 || index >= blocks.length){
 			return 0;
 		}

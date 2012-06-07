@@ -60,6 +60,7 @@ public class Chunk {
 		Biomes = chunk.getByteArray("Biomes").length > 0 ? chunk.getByteArray("Biomes") : new byte[256];
 		HeightMap = chunk.getIntArray("HeightMap").length > 0 ? chunk.getIntArray("HeightMap") : new int[256];
 
+		chunk.getList("Entities").print(System.out);
 		//load sections
 		ListTag<CompoundTag> sectionsTag = (ListTag<CompoundTag>) chunk.getList("Sections");
 		sections = new Section[16];
@@ -83,6 +84,7 @@ public class Chunk {
 			}
 		}
 
+		
 		//load Actual Entities
 		//TODO
 	}
@@ -95,7 +97,6 @@ public class Chunk {
 	public int getZ(){
 		return zPos;
 	}
-
 
 	public int getBlockId(int x,int y,int z){
 		int lx = x - (xPos * 16);
@@ -112,7 +113,7 @@ public class Chunk {
 		}
 		return 0;
 	}
-	
+
 	public void setBlockId(int x,int y,int z,int id){
 		int lx = x - (xPos * 16);
 		int lz = z - (zPos * 16);
@@ -123,12 +124,12 @@ public class Chunk {
 				){
 			throw new IllegalArgumentException("Out of Bounds" + lx + ","+ y + ","+ lz);
 		}
-		
+
 		if(sections[(int) Math.floor(y/16)]==null){
 			sections[(int) Math.floor(y/16)] = new Section((int) Math.floor(y/16));
 		}
-		
-		 sections[(int) Math.floor(y/16)].setBlockId(lx, y%16, lz,id);
+
+		sections[(int) Math.floor(y/16)].setBlockId(lx, y%16, lz,id);
 	}
 
 	public int getBlockData(int x,int y,int z){
@@ -167,13 +168,13 @@ public class Chunk {
 		int lz = z - (zPos * 16);
 		if(
 				((lx >=0 && lx<16)&&
-				(lz >=0 && lz<16)) == false
+						(lz >=0 && lz<16)) == false
 				){
 			throw new IllegalArgumentException("Out of Bounds" + lx + ","+ lz);
 		}
 		return HeightMap[lz << 4 | lx];
 	}
-	
+
 	private class Section{
 		byte Y;
 		byte[] Blocks;//4096
@@ -193,6 +194,7 @@ public class Chunk {
 			Data       = new DataLayer(new byte[2048],4);
 			SkyLight   = new DataLayer(new byte[2048],4);
 			BlockLight = new DataLayer(new byte[2048],4);
+			SkyLight.setAll(15);
 		}
 
 		Section(CompoundTag tag){
@@ -323,7 +325,7 @@ public class Chunk {
 		ListTag<CompoundTag> sectionsTag = new ListTag<CompoundTag>();
 		for(Section s :sections){
 			if(s!=null){
-				sectionsTag.add(s.getTag());
+					sectionsTag.add(s.getTag());
 			}
 		}
 		level.put("Sections",sectionsTag);
@@ -339,27 +341,40 @@ public class Chunk {
 
 	public static void main(String[] args) throws IOException{
 		RegionFileCache cache = new RegionFileCache();
-		int x = -242;
-		int z = 280;
+		int x = 129;
+		int z = 271;
 		int chunkX = (int)Math.floor((double)x / 16);
 		int chunkZ = (int)Math.floor((double)z / 16);
-		DataInputStream in = cache.getChunkDataInputStream(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\New World"), chunkX, chunkZ);
-		Chunk c = new Chunk(NbtIo.read(in).getCompound("Level"));
+		//RegionFile region = new RegionFile(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\New World\\region\\r.-1.0.mca"));
+		//DataInputStream in = cache.getChunkDataInputStream(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\New World"), chunkX, chunkZ);
+		//DataInputStream in = cache.getChunkDataInputStream(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\Shape Sea"), chunkX, chunkZ);
+		
+		DataInputStream in = cache.getChunkDataInputStream(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\New World-"), chunkX, chunkZ);
+		
+		CompoundTag lvl = NbtIo.read(in).getCompound("Level");
+		//((CompoundTag)lvl.getList("Sections").get(15)).print(System.out);
+		//printArray(((CompoundTag)lvl.getList("Sections").get(15)).getByteArray("SkyLight"),16);
+		
+		Chunk c = new Chunk(lvl);
 		in.close();
 
-		c.write(null);
-
-		for(int y=250;y>-1;y--){
-			
-				c.setBlockId(x , y, z,(byte) 20);
-			
+		//printArray(c.sections[15].Blocks,16);
+		for(int y =0 ;y<255;y++){
+		c.setBlockId(x, y,z, 22);
+		c.sections[y/16].SkyLight.set(x % 16, y%16, z %16, 2);
 		}
+		//c.write(null);
+
+		//printArray(c.HeightMap,16);
 		
-		DataOutputStream out = cache.getChunkDataOutputStream(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\New World"), chunkX, chunkZ);
+		
+		
+		DataOutputStream out = cache.getChunkDataOutputStream(new File("C:\\Documents and Settings\\James\\Desktop\\1.8\\.minecraft\\saves\\New World-"), chunkX, chunkZ);
 		if(out!=null){
 			c.write(out);
 			out.close();
 			cache.clear();
+			System.out.println("Save attempted");
 		}
 		else
 		{
@@ -369,5 +384,21 @@ public class Chunk {
 
 	}
 
+	private static void printArray(byte[] arr,int line){
+		for(int i = 0;i<arr.length;i++){
+			System.out.print(arr[i]);
+			if(i % line == line-1){
+				System.out.println();
+			}
+			else
+			{
+				System.out.print(",");
+				if(i % line*line == line*line-1){
+					System.out.println();
+				}
+			}
+			
+		}
+	}
 
 }

@@ -84,4 +84,14 @@ public class Cuboid {
 		c[1]=v2;
 		return c;
 	}
+	
+	public String toString(){
+		return world + ":" +  
+		v1.getBlockX() + ":" +
+		v1.getBlockY() + ":" +
+		v1.getBlockZ() + ":" +
+		v2.getBlockX() + ":" +
+		v2.getBlockY() + ":" +
+		v2.getBlockZ();
+	}
 }
