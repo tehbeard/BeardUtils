@@ -93,6 +93,8 @@ public class InFixConvert {
     }
 
     public static void main(String[] args){
-        System.out.println(ConvertInfixToPostfix("stats.playedfor+stats.lastlogin-kills.total".toCharArray()));
+        for(String s :ConvertInfixToPostfix("exp.total/(stats.playedfor+stats.lastlogin-kills.total)".toCharArray())){
+        System.out.println(s);
+        }
     }
 }

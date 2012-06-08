@@ -111,14 +111,15 @@ public class ArgumentPack {
         return strArgs.get(index);
     }
     public static void main(String[] args){
-        String arg = "hello \"world trees\" this -a -b is a -c \"test of the argument pack.\"";
+        String arg = "create steveAB -type creeper -c \"foo bar\"";
         String[] bool = {"a"};
-        String[] opt = {"b","c"};
+        String[] opt = {"type","c","d"};
         ArgumentPack pack = new ArgumentPack(bool, opt,arg);
 
         System.out.println(pack.strArgs.toString());
         System.out.println(pack.boolFlags.toString());
         System.out.println(pack.flagOptions.toString());
+        System.out.println(pack.getOption("d"));
     }
     private static void l(String l){
         //System.out.println(l);
