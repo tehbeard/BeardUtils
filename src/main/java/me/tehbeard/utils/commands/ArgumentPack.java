@@ -23,7 +23,19 @@ public class ArgumentPack {
     private Map<String,String> flagOptions;
     private List<String> strArgs;
 
+    public ArgumentPack(String[] boolFlags,String[] flagOpts,String[] rawArguments){
+        String r = "";
+        for(String s : rawArguments){
+            if(r.length() > 0){r+=" ";}
+            r+=s;
+        }
+        initialise(boolFlags,flagOpts,r);
+    }
     public ArgumentPack(String[] boolFlags,String[] flagOpts,String rawArguments){
+        initialise(boolFlags,flagOpts,rawArguments);
+    }
+    
+    private void initialise(String[] boolFlags,String[] flagOpts,String rawArguments){
         //initialise
         strArgs = new ArrayList<String>();
         this.boolFlags = new HashSet<String>();
