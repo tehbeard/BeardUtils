@@ -94,4 +94,9 @@ public class Cuboid {
 		v2.getBlockY() + ":" +
 		v2.getBlockZ();
 	}
+	
+	public int size(){
+        Vector v3 = v2.clone().subtract(v1.clone());
+        return (v3.getBlockX()+1) * (v3.getBlockY()+1) *  (v3.getBlockZ()+1);  
+    }
 }
