@@ -36,6 +36,8 @@ public enum BlockType{
 	NETHER_WART(115,1),
 	PISTON_BASE(29,1),
 	PISTON_STICKY_BASE(33,1),
+	TRIPWIRE_HOOK(131,1),
+	TRIPWIRE(132,1),
 	
 	//blocks affected by redstone/need blocks above to be there
 	PISTON_EXTENSION(34,2),
