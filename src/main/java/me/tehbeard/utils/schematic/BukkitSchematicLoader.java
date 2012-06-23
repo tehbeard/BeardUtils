@@ -1,10 +1,6 @@
 package me.tehbeard.utils.schematic;
 
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
 import me.tehbeard.utils.map.tileEntities.TileEntity;
 
 import org.bukkit.Location;

@@ -149,7 +149,7 @@ public class InFixExpression {
     
     public static void main(String[] args){
 
-        System.out.println(new InFixExpression("5*4^2").getValue(null));
+        //System.out.println(new InFixExpression("5*4^2").getValue(null));
     }
 
 }

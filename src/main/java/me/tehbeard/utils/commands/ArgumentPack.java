@@ -40,7 +40,7 @@ public class ArgumentPack {
         strArgs = new ArrayList<String>();
         this.boolFlags = new HashSet<String>();
         this.flagOptions = new HashMap<String, String>();
-        System.out.println(rawArguments);
+        
         boolean inQuotes = false;
         StringBuilder token = new StringBuilder();
         List<String> tokens = new ArrayList<String>();
@@ -123,8 +123,8 @@ public class ArgumentPack {
         return strArgs.get(index);
     }
     public static void main(String[] args){
-        String arg = "create steveAB -type creeper -c \"foo bar\"";
-        String[] bool = {"a"};
+        String arg = "-c * -a";
+        String[] bool = {"a","c"};
         String[] opt = {"type","c","d"};
         ArgumentPack pack = new ArgumentPack(bool, opt,arg);
 
