@@ -3,7 +3,9 @@ package me.tehbeard.utils.commands;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -52,8 +54,21 @@ public class CommandHandler implements Listener {
     @EventHandler(priority=EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event){
         if(event.isCancelled()){return;}
+        String cmd = event.getMessage().split(" ")[0];
+        if(!commandMap.containsKey(cmd)){return;}
         
-        System.out.println(event.getMessage());
+        CommandExecutor c = commandMap.get(cmd);
+        if(!hasPermission(event.getPlayer(),c)){return;}
+        
+        
+        String[] raw = event.getMessage().split(" ");
+        String[] args = new String[raw.length - 1];
+        
+        for(int i = 1;i<raw.length;i++){
+            args[i-1]=raw[i];
+        }
+        
+        c.onCommand(event.getPlayer(),null ,cmd, args);
         
     }
     
