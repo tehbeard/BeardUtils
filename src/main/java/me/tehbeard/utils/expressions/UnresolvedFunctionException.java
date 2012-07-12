@@ -1,5 +1,10 @@
 package me.tehbeard.utils.expressions;
 
+/**
+ * Thrown when A FunctionProvider cannot find the requested function
+ * @author James
+ *
+ */
 public class UnresolvedFunctionException extends Exception {
 
     /**

@@ -3,9 +3,6 @@ package me.tehbeard.utils.expressions;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
-import java.util.regex.Pattern;
-
-import javax.annotation.RegEx;
 
 import me.tehbeard.utils.expressions.functions.FunctionCatalogue;
 import me.tehbeard.utils.expressions.functions.FunctionProvider;
@@ -14,21 +11,32 @@ import me.tehbeard.utils.expressions.functions.built.ModFunction;
 import me.tehbeard.utils.expressions.functions.built.SumFunction;
 
 /**
- * Creates an object from a given infix expression that can be evaluated later.
- * Adds support for functions
+ * infix expression parser
+ * Supported operators: + - / * ^
+ * Variables ($ prefixed)
+ * Functions (@ prefixed)
  * @author James
  *
  */
 public class InFixExpressionV2 {
 
 
-    private ArrayList<String> out;
+    private ArrayList<String> rules;
 
+    /**
+     * construct a new expression
+     * @param expr expression to construct
+     */
     public InFixExpressionV2(String expr){
         process(toTokens(expr));
     }
 
 
+    /**
+     * Tokenize input string
+     * @param expr
+     * @return
+     */
     private static String[] toTokens(String expr){
         String w = new String(expr);
         w = w.replaceAll(" ","");
@@ -46,9 +54,13 @@ public class InFixExpressionV2 {
     }
 
 
-    public void process(String[] tokens){
+    /**
+     * Process tokens into expression
+     * @param tokens
+     */
+    private void process(String[] tokens){
         Stack<String> stack = new Stack<String>();
-        out = new ArrayList<String>();
+        rules = new ArrayList<String>();
 
         int parameterCount = 1;
         Stack<Integer> paramCountStack = new Stack<Integer>();
@@ -56,7 +68,7 @@ public class InFixExpressionV2 {
         for(String token : tokens){
             //if variable or token add to the pile
             if(isNumber(token) || isVariable(token)){
-                out.add(token);
+                rules.add(token);
             }else if(isFunction(token)|| token.charAt(0) =='('){
                 if(isFunction(token)){
                     paramCountStack.push(parameterCount);
@@ -69,7 +81,7 @@ public class InFixExpressionV2 {
                 //if it's a separator
                 while ((stack.size() > 0) && (stack.peek().charAt(0) != '('))
                 {
-                    out.add(stack.pop());
+                    rules.add(stack.pop());
                 }
 
 
@@ -79,7 +91,7 @@ public class InFixExpressionV2 {
                 {
                     if (comparePrecedence(stack.peek().charAt(0), token.charAt(0)))
                     {
-                        out.add(stack.pop());
+                        rules.add(stack.pop());
                     }
                     else
                     {
@@ -91,26 +103,26 @@ public class InFixExpressionV2 {
             }else if(token.equals(")")){
                 while ((stack.size() > 0) && (stack.peek().charAt(0) != '('))
                 {
-                    out.add(stack.pop());
+                    rules.add(stack.pop());
                 }
 
                 if (stack.size() > 0){
                     stack.pop(); // popping out the left brace '('
                     if(isFunction(stack.peek())){
-                        out.add("" + parameterCount);
+                        rules.add("" + parameterCount);
                         if(paramCountStack.size()>0){
                             parameterCount=  paramCountStack.pop();  
                         }else{
                             parameterCount=1;
                         }
-                        out.add(stack.pop());
+                        rules.add(stack.pop());
                     }
                 }
             }
         }
         while (stack.size() > 0)
         {
-            out.add(stack.pop());
+            rules.add(stack.pop());
         }
 
     }
@@ -139,17 +151,6 @@ public class InFixExpressionV2 {
     private static boolean comparePrecedence(char top, char p_2)
     {
         return getOpVal(top) > getOpVal(p_2);
-        /*
-        if (top == '+' && p_2 == '*') // + has lower precedence than *
-            return false;
-
-        if (top == '*' && p_2 == '-') // * has higher precedence over -
-            return true;
-
-        if (top == '+' && p_2 == '-') // + has same precedence over +
-            return true;
-
-        return true;/**/
     }
 
     private static int getOpVal(char op){
@@ -168,15 +169,15 @@ public class InFixExpressionV2 {
 
 
     /**
-     * 
-     * @param varProvider
-     * @param funcProvider
+     * resolve the value of the expression
+     * @param varProvider variable resolver to use
+     * @param funcProvider function resolver to use
      * @return
      */
     public int getValue(VariableProvider varProvider,FunctionProvider funcProvider){
         Stack<Integer> stack = new Stack<Integer>();  
 
-        Iterator<String> it = out.iterator();
+        Iterator<String> it = rules.iterator();
         while(it.hasNext()){
             String exp = it.next();
             int i = 0;

@@ -5,6 +5,11 @@ import java.util.List;
 
 import me.tehbeard.utils.expressions.UnresolvedFunctionException;
 
+/**
+ * Implements a composite of of FunctionProviders, enabling reuse
+ * @author James
+ *
+ */
 public class FunctionCatalogue implements FunctionProvider {
 
     
@@ -13,6 +18,12 @@ public class FunctionCatalogue implements FunctionProvider {
     public FunctionCatalogue(){
         providers = new ArrayList<FunctionProvider>();
     }
+    
+    /**
+     * Constructs a function provider using these providers
+     * NOTE: for providers with conflicting function names, order in this constructor provides presendence.
+     * @param providers
+     */
     
     public FunctionCatalogue(FunctionProvider... providers){
         this();
