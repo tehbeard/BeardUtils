@@ -52,7 +52,7 @@ public class ArgumentPack {
         strArgs = new ArrayList<String>();
         this.boolFlags = new HashSet<String>();
         this.flagOptions = new HashMap<String, String>();
-        System.out.println(rawArguments);
+        l(rawArguments);
         boolean inQuotes = false;
         StringBuilder token = new StringBuilder();
         List<String> tokens = new ArrayList<String>();
@@ -139,7 +139,7 @@ public class ArgumentPack {
         return Double.parseDouble(get(index));
     }
     public static void main(String[] args){
-        String arg = "create steveAB -type creeper -c \"foo bar\"";
+        String arg = "create steveAB -type creeper -a -c \"foo bar\"";
         String[] bool = {"a"};
         String[] opt = {"type","c","d"};
         ArgumentPack pack = new ArgumentPack(bool, opt,arg);
@@ -147,7 +147,7 @@ public class ArgumentPack {
         System.out.println(pack.strArgs.toString());
         System.out.println(pack.boolFlags.toString());
         System.out.println(pack.flagOptions.toString());
-        System.out.println(pack.getOption("d"));
+        System.out.println(pack.getOption("c"));
     }
     private static void l(String l){
         //System.out.println(l);

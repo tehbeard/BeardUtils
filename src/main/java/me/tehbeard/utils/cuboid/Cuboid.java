@@ -24,6 +24,10 @@ public class Cuboid {
 	public Cuboid(){
 
 	}
+	
+	public Cuboid(String line){
+	    setCuboid(line);
+	}
 
 	public void setCuboid(String line){
 		String[] l = line.split(":");
