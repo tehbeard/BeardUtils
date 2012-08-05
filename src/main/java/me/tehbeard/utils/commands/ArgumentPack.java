@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.command.CommandSender;
+
 /**
  * Constructs an argument pack to allow building commands eaiser
  * Takes an argument string as input and provides simple methods to access
@@ -22,7 +24,17 @@ public class ArgumentPack {
     private Set<String> boolFlags;
     private Map<String,String> flagOptions;
     private List<String> strArgs;
-
+    private CommandSender sender;
+    
+    public CommandSender getSender() {
+        return sender;
+    }
+    
+    public ArgumentPack(CommandSender sender,String[] boolFlags,String[] flagOpts,String[] rawArguments){
+        this(boolFlags,flagOpts,rawArguments);
+        this.sender = sender;
+    }
+    
     public ArgumentPack(String[] boolFlags,String[] flagOpts,String[] rawArguments){
         String r = "";
         for(String s : rawArguments){
@@ -121,6 +133,10 @@ public class ArgumentPack {
     
     public String get(int index){
         return strArgs.get(index);
+    }
+    
+    public Number getNumber(int index){
+        return Double.parseDouble(get(index));
     }
     public static void main(String[] args){
         String arg = "create steveAB -type creeper -c \"foo bar\"";
