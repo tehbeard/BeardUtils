@@ -240,7 +240,7 @@ public class InFixExpressionV2 {
     }
 
     public static void l(String n){
-        System.out.println(n);
+        //System.out.println(n);
     }
 
 }
