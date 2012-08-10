@@ -580,4 +580,10 @@ public class FakeWorld implements World{
         return false;
     }
 
+
+    public Entity spawnEntity(Location arg0, EntityType arg1) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
