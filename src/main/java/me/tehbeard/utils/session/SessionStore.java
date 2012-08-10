@@ -49,10 +49,13 @@ public class SessionStore<T> implements Listener {
 		return sessions.get(player);
 	}
 	
+	public void clearSession(String player){
+	    sessions.remove(player);
+	}
 		
 	@EventHandler
 	public void logout(PlayerQuitEvent e){
-		sessions.remove(e.getPlayer().getName());
+	    clearSession(e.getPlayer().getName());
 	}
 	
 }

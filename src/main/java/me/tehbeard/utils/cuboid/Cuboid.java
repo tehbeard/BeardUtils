@@ -49,6 +49,14 @@ public class Cuboid {
 		v2=c2;
 		this.world = world;
 	}
+	
+	public void setV1(Vector c1){
+	    v1 = c1;
+	}
+	
+	public void setV2(Vector c2){
+        v2 = c2;
+    }
 
 	/**
 	 * is a location inside this cuboid
