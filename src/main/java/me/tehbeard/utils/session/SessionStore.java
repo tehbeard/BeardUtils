@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
@@ -50,10 +49,13 @@ public class SessionStore<T> implements Listener {
 		return sessions.get(player);
 	}
 	
+	public void clearSession(String player){
+	    sessions.remove(player);
+	}
 		
 	@EventHandler
 	public void logout(PlayerQuitEvent e){
-		sessions.remove(e.getPlayer().getName());
+	    clearSession(e.getPlayer().getName());
 	}
 	
 }

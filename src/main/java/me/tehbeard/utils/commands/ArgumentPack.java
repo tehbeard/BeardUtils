@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.command.CommandSender;
+
 /**
  * Constructs an argument pack to allow building commands eaiser
  * Takes an argument string as input and provides simple methods to access
@@ -22,7 +24,17 @@ public class ArgumentPack {
     private Set<String> boolFlags;
     private Map<String,String> flagOptions;
     private List<String> strArgs;
-
+    private CommandSender sender;
+    
+    public CommandSender getSender() {
+        return sender;
+    }
+    
+    public ArgumentPack(CommandSender sender,String[] boolFlags,String[] flagOpts,String[] rawArguments){
+        this(boolFlags,flagOpts,rawArguments);
+        this.sender = sender;
+    }
+    
     public ArgumentPack(String[] boolFlags,String[] flagOpts,String[] rawArguments){
         String r = "";
         for(String s : rawArguments){
@@ -40,7 +52,9 @@ public class ArgumentPack {
         strArgs = new ArrayList<String>();
         this.boolFlags = new HashSet<String>();
         this.flagOptions = new HashMap<String, String>();
-        
+
+        l(rawArguments);
+
         boolean inQuotes = false;
         StringBuilder token = new StringBuilder();
         List<String> tokens = new ArrayList<String>();
@@ -122,16 +136,21 @@ public class ArgumentPack {
     public String get(int index){
         return strArgs.get(index);
     }
+    
+    public Number getNumber(int index){
+        return Double.parseDouble(get(index));
+    }
     public static void main(String[] args){
-        String arg = "-c * -a";
-        String[] bool = {"a","c"};
+
+        String arg = "create steveAB -type creeper -a -c \"foo bar\"";
+        String[] bool = {"a"};
         String[] opt = {"type","c","d"};
         ArgumentPack pack = new ArgumentPack(bool, opt,arg);
 
         System.out.println(pack.strArgs.toString());
         System.out.println(pack.boolFlags.toString());
         System.out.println(pack.flagOptions.toString());
-        System.out.println(pack.getOption("d"));
+        System.out.println(pack.getOption("c"));
     }
     private static void l(String l){
         //System.out.println(l);
