@@ -49,12 +49,8 @@ public enum BlockType{
 	CACTUS(81,2),
 	REED(83,2),
 	CAKE_BLOCK(92,2),
-	DISPENSER(23,2),
+	DISPENSER(23,2);
 	
-	//gravel and sand
-	GRAVEL(13,3),
-	SAND(12,3)
-	;
 	public final int typeId;
 	public final int order;
 
