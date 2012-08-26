@@ -18,6 +18,7 @@ public class BukkitSchematicLoader {
 		addBlocks(l,0);
 		addBlocks(l,1);
 		addBlocks(l,2);
+		addBlocks(l,3);
 		
 		for(TileEntity t:schematic.getTileEntities()){
 			t.place(l);
