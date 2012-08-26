@@ -112,13 +112,10 @@ public class CommandHandler implements Listener {
             try {
                 method.invoke(null, pack);
             } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
