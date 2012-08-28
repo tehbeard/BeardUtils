@@ -23,7 +23,7 @@ public class InFixExpression {
      * @param expr
      */
     public InFixExpression(String expr){
-        System.out.println(convertInfixToPostfix(expr));
+        
         for(String exp : convertInfixToPostfix(expr).split(" ")){
             if(exp.length() > 0){
                 this.expr.add(exp);
