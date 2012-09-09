@@ -98,8 +98,9 @@ public class CommandHandler implements Listener {
         for(int i = 1;i<raw.length;i++){
             args[i-1]=raw[i];
         }
-        ArgumentPack pack = null;
-
+        
+        CommandInfo ci = getInfo(cmd);
+        ArgumentPack pack = new ArgumentPack(event.getPlayer(),ci.boolFlags, ci.optFlags, args);
         c.execute(pack);
 
     }

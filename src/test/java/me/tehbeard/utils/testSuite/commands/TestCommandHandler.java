@@ -6,7 +6,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import me.tehbeard.utils.commands.ArgumentPack;
 import me.tehbeard.utils.commands.CommandHandler;
+import me.tehbeard.utils.commands.CommandHandler.CommandInfo;
 
 public class TestCommandHandler {
 
@@ -38,5 +40,15 @@ public class TestCommandHandler {
         assertFalse(handler.getInfo("command").execute(null));
     }
     
+    @Test
+    public void testArgPackPassing(){
+        handler.addCommand(BCommand.class);
+        CommandInfo ci = handler.getInfo("create");
+        String arguments = "steveAB -type creeper -a -c \"foo bar\"";
+        ArgumentPack pack = new ArgumentPack(ci.boolFlags, ci.optFlags, arguments);
+        ci.execute(pack);
+        
+        //
+    }
    
 }
