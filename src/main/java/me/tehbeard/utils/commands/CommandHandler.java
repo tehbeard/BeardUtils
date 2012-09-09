@@ -15,7 +15,7 @@ import org.bukkit.permissions.Permissible;
 public class CommandHandler implements Listener {
 
 
-    private Map<String,CommandInfo> commandMap;
+    public Map<String,CommandInfo> commandMap;
 
     public CommandHandler(){
         commandMap = new HashMap<String, CommandInfo>();
@@ -27,13 +27,15 @@ public class CommandHandler implements Listener {
      * @param executor executor to add
      * @return true if added, false if not
      */
-    public boolean addCommand(Object executor){
+    public void addCommand(Class<?> executor){
 
-        for(Method m : executor.getClass().getMethods()){
+        for(Method m : executor.getMethods()){
             CommandDescriptor scrip = m.getAnnotation(CommandDescriptor.class);
             if(scrip != null){
+                if(!m.getReturnType().equals(boolean.class)){
+                    throw new IllegalArgumentException(m.getName() + " Methods must return a boolean");
+                }
                 if(Modifier.isStatic(m.getModifiers())){
-                    String permission = "";
                     Class<?>[] params = m.getParameterTypes();
                     if(params.length != 1){
                         throw new IllegalArgumentException("Invalid number of parameters for function handling " + scrip.label());
@@ -42,11 +44,20 @@ public class CommandHandler implements Listener {
                     if(!params[0].equals(ArgumentPack.class)){
                         throw new IllegalArgumentException("Parameter must be of type ArgumentPack for function handling " + scrip.label());
                     }
-                    CommandPermission cp = m.getAnnotation(CommandPermission.class);
-                    if(cp!=null){permission = cp.permissionNode();}
-                    CommandInfo ci = new CommandInfo(m, permission);
                     
-                    String tag = "";
+                    CommandPermission cp = m.getAnnotation(CommandPermission.class);
+                    String permission = "";
+                    if(cp!=null){permission = cp.permissionNode();}
+                    
+                    CommandBooleanFlags cbf = m.getAnnotation(CommandBooleanFlags.class);
+                    String[] _cbf = cbf!=null ? cbf.value(): new String[0];
+                    
+                    CommandOptionFlags cof = m.getAnnotation(CommandOptionFlags.class);
+                    String[] _cof = cof!=null ? cof.value(): new String[0];
+                    
+                    CommandInfo ci = new CommandInfo(m, permission,_cbf,_cof);
+                    
+                    String tag = null;
                     if(!commandMap.containsKey(scrip.label())){
                         tag=scrip.label();
                     }
@@ -59,7 +70,7 @@ public class CommandHandler implements Listener {
                             }
                         }
                     }
-                    if(tag==null){System.out.println("Could not add CommandExecutor, name + aliases already taken for " + scrip.label() );return false;}
+                    if(tag==null){System.out.println("Could not add CommandExecutor, name + aliases already taken for " + scrip.label() );}
                     commandMap.put(tag, ci);
                 }
                 else
@@ -67,11 +78,8 @@ public class CommandHandler implements Listener {
                     throw new IllegalStateException("Command " + scrip.label() + " Must be a static method");
                 }
             }
-            
-            
 
         }
-        return true; 
     }
 
     @EventHandler(priority=EventPriority.MONITOR)
@@ -90,8 +98,9 @@ public class CommandHandler implements Listener {
         for(int i = 1;i<raw.length;i++){
             args[i-1]=raw[i];
         }
+        ArgumentPack pack = null;
 
-        c.execute(null);
+        c.execute(pack);
 
     }
 
@@ -100,17 +109,34 @@ public class CommandHandler implements Listener {
         return p.hasPermission(executor.permission) || executor.permission=="";
     }
 
-    private class CommandInfo {
+    public class CommandInfo {
         private final Method method;
         public final String permission;
-        public CommandInfo(Method method,String permission){
+        public final String [] boolFlags;
+        public final String [] optFlags;
+        
+        
+        
+        /**
+         * @param method
+         * @param permission
+         * @param boolFlags
+         * @param optFlags
+         */
+        public CommandInfo(Method method, String permission,
+                String[] boolFlags, String[] optFlags) {
+            super();
             this.method = method;
             this.permission = permission;
+            this.boolFlags = boolFlags;
+            this.optFlags = optFlags;
         }
-        
-        public void execute(ArgumentPack pack){
+
+
+
+        public Boolean execute(ArgumentPack pack){
             try {
-                method.invoke(null, pack);
+                return (Boolean) method.invoke(null, pack);
             } catch (IllegalAccessException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -121,8 +147,13 @@ public class CommandHandler implements Listener {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            return false;
         }
 
+    }
+    
+    public CommandInfo getInfo(String comm){
+        return commandMap.get(comm);
     }
 
 }
