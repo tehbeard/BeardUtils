@@ -29,12 +29,11 @@ public class ArgumentPack {
     public CommandSender getSender() {
         return sender;
     }
-    
+   
     public ArgumentPack(CommandSender sender,String[] boolFlags,String[] flagOpts,String[] rawArguments){
         this(boolFlags,flagOpts,rawArguments);
         this.sender = sender;
     }
-    
     public ArgumentPack(String[] boolFlags,String[] flagOpts,String[] rawArguments){
         String r = "";
         for(String s : rawArguments){
@@ -52,7 +51,6 @@ public class ArgumentPack {
         strArgs = new ArrayList<String>();
         this.boolFlags = new HashSet<String>();
         this.flagOptions = new HashMap<String, String>();
-        l(rawArguments);
         boolean inQuotes = false;
         StringBuilder token = new StringBuilder();
         List<String> tokens = new ArrayList<String>();
@@ -64,16 +62,13 @@ public class ArgumentPack {
                     token.append(c);
                 }else{
                     if(token.length() > 0){
-                        l("" + token.length());
                         tokens.add(token.toString().trim());
                     }
-                    l("adding token");
                     token = new StringBuilder();
                 }
                 ;break;
             case '"':
             inQuotes = !inQuotes;
-            l("Swapping to quote mode " +( inQuotes ?"on":"off"));
             break;
             default: token.append(c);break;
             }
@@ -97,7 +92,6 @@ public class ArgumentPack {
                 }
                 if(inArray(flagOpts, t)){
                     if(it.hasNext()){
-                        l(t);
                         this.flagOptions.put(t, it.next());
                     }
                     continue;
@@ -119,37 +113,48 @@ public class ArgumentPack {
 
     }
 
+    /**
+     * Return whether a boolean flag was set
+     * @param flag
+     * @return
+     */
     public boolean getFlag(String flag){
         return boolFlags.contains(flag);
     }
     
+    /**
+     * Return value of option flag
+     * @param flag value or null on not set
+     * @return
+     */
     public String getOption(String flag){
         return flagOptions.get(flag); 
     }
     
+    /**
+     * Number of string arguments
+     * @return
+     */
     public int size(){
         return strArgs.size();
     }
     
+    /**
+     * Get a string argument
+     * @param index
+     * @return
+     */
     public String get(int index){
         return strArgs.get(index);
     }
     
+    /**
+     * Return string argument as number.
+     * @param index
+     * @return
+     */
     public Number getNumber(int index){
         return Double.parseDouble(get(index));
     }
-    public static void main(String[] args){
-        String arg = "create steveAB -type creeper -a -c \"foo bar\"";
-        String[] bool = {"a"};
-        String[] opt = {"type","c","d"};
-        ArgumentPack pack = new ArgumentPack(bool, opt,arg);
 
-        System.out.println(pack.strArgs.toString());
-        System.out.println(pack.boolFlags.toString());
-        System.out.println(pack.flagOptions.toString());
-        System.out.println(pack.getOption("c"));
-    }
-    private static void l(String l){
-        //System.out.println(l);
-    }
 }
