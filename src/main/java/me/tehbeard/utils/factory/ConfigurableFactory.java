@@ -52,8 +52,7 @@ public abstract class ConfigurableFactory<C,A> {
     public C getProduct(String tag)throws IllegalStateException{
         if(products.containsKey(tag)){
             try {
-                C object = products.get(tag).newInstance();
-                return object;
+                return produce(tag);
             } catch (InstantiationException e) {
                 throw new IllegalStateException("Could not create instance of the object");
             } catch (IllegalAccessException e) {
@@ -62,6 +61,10 @@ public abstract class ConfigurableFactory<C,A> {
             }	
         }
         return null;
+    }
+    
+    protected C produce(String tag) throws InstantiationException, IllegalAccessException{
+        return products.get(tag).newInstance();
     }
 
     /**
