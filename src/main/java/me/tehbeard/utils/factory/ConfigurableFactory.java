@@ -63,6 +63,13 @@ public abstract class ConfigurableFactory<C,A> {
         return null;
     }
     
+    /**
+     * Method that produces products, override to change initialisation behaviour
+     * @param tag
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
     protected C produce(String tag) throws InstantiationException, IllegalAccessException{
         return products.get(tag).newInstance();
     }
@@ -74,7 +81,10 @@ public abstract class ConfigurableFactory<C,A> {
      */
     public abstract String getTag(A annotation);
 
-    
+    /**
+     * Returns all tags factory can produce
+     * @return
+     */
     public Set<String> getTags(){
         
         return products.keySet();
