@@ -15,7 +15,9 @@ import java.util.zip.ZipFile;
 
 /**
  * Represents a generic addon loader 
- * An addon loader must be for a specific type of class
+ * AddonLoader provides a mechanism for plugins to load small amounts of code from jars, without having to use bukkit plugins
+ * Examples of use could be to load a custom developed class for performing an action (such as a trigger, or a spell) 
+ * Each addon loader must be for a specific type of class.
  */
 public abstract class AddonLoader<T> {
 
@@ -102,11 +104,16 @@ public abstract class AddonLoader<T> {
     }
 
     /**
-     * Makes a class of classType
-     * @param classType
+     * Called to initialise an addon after it has been loaded
+     * @param classType class to initialise
      */
     public abstract void makeClass(Class<? extends T> classType);
 
+    /**
+     * Takes the ZipFile of an addon and returns a list of the classes to load from it
+     * @param file
+     * @return
+     */
     public abstract List<String> getClassList(ZipFile file);
 
 }
