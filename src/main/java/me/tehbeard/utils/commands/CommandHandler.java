@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -85,14 +86,19 @@ public class CommandHandler implements Listener {
     @EventHandler(priority=EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event){
         if(event.isCancelled()){return;}
-        String cmd = event.getMessage().split(" ")[0];
+        executeCommand(event.getPlayer(),event.getMessage());
+    }
+    
+    public void executeCommand(CommandSender sender,String command){
+        
+        String cmd = command.split(" ")[0];
         if(!commandMap.containsKey(cmd)){return;}
 
         CommandInfo c = commandMap.get(cmd);
-        if(!hasPermission(event.getPlayer(),c)){return;}
+        if(!hasPermission(sender,c)){return;}
 
 
-        String[] raw = event.getMessage().split(" ");
+        String[] raw = command.split(" ");
         String[] args = new String[raw.length - 1];
 
         for(int i = 1;i<raw.length;i++){
@@ -100,9 +106,8 @@ public class CommandHandler implements Listener {
         }
         
         CommandInfo ci = getInfo(cmd);
-        ArgumentPack pack = new ArgumentPack(event.getPlayer(),ci.boolFlags, ci.optFlags, args);
+        ArgumentPack pack = new ArgumentPack(sender,ci.boolFlags, ci.optFlags, args);
         c.execute(pack);
-
     }
 
 

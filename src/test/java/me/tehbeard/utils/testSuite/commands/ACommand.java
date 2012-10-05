@@ -2,7 +2,6 @@ package me.tehbeard.utils.testSuite.commands;
 
 import me.tehbeard.utils.commands.ArgumentPack;
 import me.tehbeard.utils.commands.CommandDescriptor;
-
 public class ACommand {
 
     
