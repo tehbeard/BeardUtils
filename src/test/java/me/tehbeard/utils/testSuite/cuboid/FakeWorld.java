@@ -12,6 +12,8 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Difficulty;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.TreeType;
 import org.bukkit.World;
 import org.bukkit.WorldType;
@@ -21,6 +23,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
@@ -582,6 +585,32 @@ public class FakeWorld implements World{
 
 
     public Entity spawnEntity(Location arg0, EntityType arg1) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public boolean isChunkInUse(int arg0, int arg1) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public void playSound(Location arg0, Sound arg1, float arg2, float arg3) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    public FallingBlock spawnFallingBlock(Location arg0, Material arg1,
+            byte arg2) throws IllegalArgumentException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public FallingBlock spawnFallingBlock(Location arg0, int arg1, byte arg2)
+            throws IllegalArgumentException {
         // TODO Auto-generated method stub
         return null;
     }
