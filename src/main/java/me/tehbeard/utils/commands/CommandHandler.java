@@ -13,6 +13,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.permissions.Permissible;
 
+/**
+ * Processes commands inputed by a user
+ * Currently supports CommandPreprocessEvent and manual call via executeCommand 
+ * @author James
+ *
+ */
 public class CommandHandler implements Listener {
 
 
@@ -83,12 +89,21 @@ public class CommandHandler implements Listener {
         }
     }
 
+    /**
+     * Handles a command event
+     * @param event
+     */
     @EventHandler(priority=EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event){
         if(event.isCancelled()){return;}
         executeCommand(event.getPlayer(),event.getMessage());
     }
     
+    /**
+     * execute a command as sender
+     * @param sender who to execute as
+     * @param command command to execute, should NOT have leading /
+     */
     public void executeCommand(CommandSender sender,String command){
         
         String cmd = command.split(" ")[0];
