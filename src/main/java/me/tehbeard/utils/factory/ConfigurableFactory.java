@@ -14,7 +14,7 @@ import java.util.Set;
  * @param <C>
  */
 public abstract class ConfigurableFactory<C,A> {
-    private Map<String,Class<? extends C>> products;
+    protected Map<String,Class<? extends C>> products;
     private Class<? extends Annotation> annotation;
 
     /**
@@ -28,7 +28,7 @@ public abstract class ConfigurableFactory<C,A> {
     /**
      * Parse a product and add it to the factory
      * @param product product to add to the factory
-     * @return wether it was added or not
+     * @return whether it was added or not
      */
     @SuppressWarnings("unchecked")
     public boolean addProduct(Class<? extends C> product){
