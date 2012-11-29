@@ -9,6 +9,7 @@ import me.tehbeard.utils.syringe.Injector;
 
 /**
  * Reads config values out of a class
+ * Values are pulled from fields with @InjectConfig attacked to them
  * @author James
  *
  */
@@ -31,6 +32,11 @@ public class ConfigExtractor extends Injector<Object,InjectConfig> {
         section.set(annotation.value(),field.get(object));
     }
 
+    /**
+     * Returns a configuration object for the supplied object.
+     * @param object
+     * @return
+     */
     public ConfigurationSection getConfiguration(Object object){
         cleanConfig();
         inject(object);

@@ -6,6 +6,12 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import me.tehbeard.utils.syringe.Injector;
 
+/**
+ * Injects data into fields of an object from a ConfigurationSection,
+ * using @InjectConfig annotations
+ * @author James
+ *
+ */
 public class ConfigInjector extends Injector<Object,InjectConfig> {
 
     private ConfigurationSection section;
@@ -13,7 +19,6 @@ public class ConfigInjector extends Injector<Object,InjectConfig> {
         
         super(InjectConfig.class);
         this.section = section;
-        // TODO Auto-generated constructor stub
     }
 
     @Override
@@ -21,7 +26,6 @@ public class ConfigInjector extends Injector<Object,InjectConfig> {
             throws IllegalArgumentException, IllegalAccessException {
         Object value = section.get(annotation.value());
         field.set(object,value);
-        // TODO Auto-generated method stub
         
     }
 

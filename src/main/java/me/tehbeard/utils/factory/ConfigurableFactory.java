@@ -9,6 +9,7 @@ import java.util.Set;
 /**
  * Represents a factory for various classes
  * Any item placed into the factory must have an annotation
+ * This annotation defines the product name, which is used to retrieve instances of said class.
  * @author james
  *
  * @param <C>

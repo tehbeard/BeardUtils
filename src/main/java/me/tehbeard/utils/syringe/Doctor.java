@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Administers injectors to an object
+ * Runs a collection of injectors on a class
  * @author James
  *
  */

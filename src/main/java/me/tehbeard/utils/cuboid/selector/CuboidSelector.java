@@ -13,6 +13,12 @@ import me.tehbeard.utils.cuboid.Cuboid;
 import me.tehbeard.utils.cuboid.selector.CuboidSelector.StatusIndicator.Activity;
 import me.tehbeard.utils.session.SessionStore;
 
+/**
+ * Standard class for selecting a region of a world (cuboid)
+ * Relies on SessionStore and Cuboid packages
+ * @author James
+ *
+ */
 public class CuboidSelector implements Listener{
 
     private SessionStore<Cuboid> session = new SessionStore<Cuboid>();
