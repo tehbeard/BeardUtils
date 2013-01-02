@@ -17,7 +17,7 @@ import org.junit.Test;
 
 public class TestYaml {
 
-    
+    /*
     @Inject
     List<ItemStack> l;
     
@@ -91,5 +91,5 @@ public class TestYaml {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
+    }*/
 }
