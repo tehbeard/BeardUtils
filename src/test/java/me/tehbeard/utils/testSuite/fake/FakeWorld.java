@@ -1,4 +1,4 @@
-package me.tehbeard.utils.testSuite.cuboid;
+package me.tehbeard.utils.testSuite.fake;
 
 import java.io.File;
 import java.util.Collection;
@@ -613,6 +613,49 @@ public class FakeWorld implements World{
             throws IllegalArgumentException {
         // TODO Auto-generated method stub
         return null;
+    }
+
+
+    public boolean createExplosion(double arg0, double arg1, double arg2,
+            float arg3, boolean arg4, boolean arg5) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public int getAmbientSpawnLimit() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+
+    public String getGameRuleValue(String arg0) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public String[] getGameRules() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public boolean isGameRule(String arg0) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public void setAmbientSpawnLimit(int arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    public boolean setGameRuleValue(String arg0, String arg1) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

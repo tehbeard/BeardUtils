@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.tehbeard.utils.syringe.configInjector.ConfigInjector;
+import me.tehbeard.utils.syringe.configInjector.YamlConfigInjector;
 import me.tehbeard.utils.syringe.configInjector.InjectConfig;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -56,7 +56,7 @@ public class ConfigInjectTest {
         
         c.loadFromString(s);
         
-        ConfigInjector ci = new ConfigInjector(c);
+        YamlConfigInjector ci = new YamlConfigInjector(c);
         ci.inject(this);
         
         assertEquals("variable test foo->bar","bar",test);

@@ -13,10 +13,10 @@ import me.tehbeard.utils.syringe.Injector;
  * @author James
  *
  */
-public class ConfigExtractor extends Injector<Object,InjectConfig> {
+public class YamlConfigExtractor extends Injector<Object,InjectConfig> {
 
     private ConfigurationSection section;
-    public ConfigExtractor() {
+    public YamlConfigExtractor() {
 
         super(InjectConfig.class);
         cleanConfig();

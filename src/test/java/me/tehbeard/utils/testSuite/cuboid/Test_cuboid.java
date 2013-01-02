@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import me.tehbeard.utils.cuboid.Cuboid;
+import me.tehbeard.utils.testSuite.fake.FakeWorld;
 
 public class Test_cuboid {
 

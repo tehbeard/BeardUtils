@@ -1,8 +1,8 @@
 package me.tehbeard.utils.testSuite.syringe;
 
 import static org.junit.Assert.*;
-import me.tehbeard.utils.syringe.configInjector.ConfigExtractor;
-import me.tehbeard.utils.syringe.configInjector.ConfigInjector;
+import me.tehbeard.utils.syringe.configInjector.YamlConfigExtractor;
+import me.tehbeard.utils.syringe.configInjector.YamlConfigInjector;
 import me.tehbeard.utils.syringe.configInjector.InjectConfig;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,7 +31,7 @@ public class ConfigExtractTest {
     public void test(){
         ConfigurationSection section = new MemoryConfiguration();
         
-        ConfigExtractor cx = new ConfigExtractor();
+        YamlConfigExtractor cx = new YamlConfigExtractor();
         
         YamlConfiguration c = new YamlConfiguration();
         c.set("root",cx.getConfiguration(this));
