@@ -223,21 +223,7 @@ public class InFixExpressionV2 {
 
 
 
-    public static void main(String[] args){
-
-        String sub = "@avg(8,@sum(1,2,3)) + @mod(22,12)";
-        InFixExpressionV2 i = new InFixExpressionV2(sub);
-
-        FunctionProvider funcProvider = new FunctionCatalogue(
-                new AvgFunction(),
-                new SumFunction(),
-                new ModFunction()
-                );
-        l("result: " + i.getValue(null, funcProvider ));
-
-
-
-    }
+    
 
     public static void l(String n){
         //System.out.println(n);
