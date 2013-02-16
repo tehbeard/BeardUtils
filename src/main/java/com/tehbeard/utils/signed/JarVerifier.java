@@ -34,13 +34,14 @@ public class JarVerifier {
 
         // Ensure all the entries' signatures verify correctly
         byte[] buffer = new byte[8192];
-        Enumeration entries = jf.entries();
+        Enumeration<JarEntry> entries = jf.entries();
 
         while (entries.hasMoreElements()) {
-            JarEntry je = (JarEntry) entries.nextElement();
+            JarEntry je = entries.nextElement();
             entriesVec.addElement(je);
             InputStream is = jf.getInputStream(je);
-            int n;
+            @SuppressWarnings("unused")
+			int n;
             while ((n = is.read(buffer, 0, buffer.length)) != -1) {
                 // we just read. this will throw a SecurityException
                 // if  a signature/digest check fails.
@@ -50,9 +51,9 @@ public class JarVerifier {
         jf.close();
 
         // Get the list of signer certificates
-        Enumeration e = entriesVec.elements();
+        Enumeration<JarEntry> e = entriesVec.elements();
         while (e.hasMoreElements()) {
-            JarEntry je = (JarEntry) e.nextElement();
+            JarEntry je = e.nextElement();
 
             if (je.isDirectory())
                 continue;

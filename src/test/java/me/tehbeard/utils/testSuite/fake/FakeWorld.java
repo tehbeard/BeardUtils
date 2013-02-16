@@ -35,6 +35,7 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
+@SuppressWarnings("deprecation")
 public class FakeWorld implements World{
 
     String name;

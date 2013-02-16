@@ -13,8 +13,6 @@ public class BCommand {
     @CommandOptionFlags({"type","c","d"})
     public static boolean command(ArgumentPack pack){
         
-        String arg = "create steveAB -type creeper -a -c \"foo bar\"";
-        
         System.out.println("Name: "+ pack.get(0));
         System.out.println("Type: "+ pack.getOption("type"));
         System.out.println("C   : "+ pack.getOption("c"));
