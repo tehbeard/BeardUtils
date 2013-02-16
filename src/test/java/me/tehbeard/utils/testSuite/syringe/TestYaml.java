@@ -1,19 +1,5 @@
 package me.tehbeard.utils.testSuite.syringe;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
-import me.tehbeard.utils.syringe.Inject;
-import me.tehbeard.utils.syringe.Injector;
-
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-import org.junit.Test;
-
 
 public class TestYaml {
 

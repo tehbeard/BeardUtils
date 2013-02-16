@@ -1,8 +1,6 @@
 package me.tehbeard.utils.testSuite.syringe;
 
-import static org.junit.Assert.*;
 import me.tehbeard.utils.syringe.configInjector.YamlConfigExtractor;
-import me.tehbeard.utils.syringe.configInjector.YamlConfigInjector;
 import me.tehbeard.utils.syringe.configInjector.InjectConfig;
 
 import org.bukkit.configuration.ConfigurationSection;
