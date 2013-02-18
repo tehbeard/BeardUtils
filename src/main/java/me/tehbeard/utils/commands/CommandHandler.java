@@ -7,10 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.permissions.Permissible;
 
 /**
@@ -62,7 +65,7 @@ public class CommandHandler implements Listener {
                     CommandOptionFlags cof = m.getAnnotation(CommandOptionFlags.class);
                     String[] _cof = cof!=null ? cof.value(): new String[0];
                     
-                    CommandInfo ci = new CommandInfo(m, permission,_cbf,_cof);
+                    CommandInfo ci = new CommandInfo(m, permission,_cbf,_cof,scrip.senderType());
                     
                     String tag = null;
                     if(!commandMap.containsKey(scrip.label())){
@@ -100,6 +103,17 @@ public class CommandHandler implements Listener {
     }
     
     /**
+     * Handles a command event from the console
+     * @param event
+     */
+    @EventHandler(priority=EventPriority.MONITOR)
+    public void onCommand(ServerCommandEvent event){
+        
+        executeCommand(event.getSender(),event.getCommand());
+    }
+    
+    
+    /**
      * execute a command as sender
      * @param sender who to execute as
      * @param command command to execute, should NOT have leading /
@@ -135,7 +149,7 @@ public class CommandHandler implements Listener {
         public final String permission;
         public final String [] boolFlags;
         public final String [] optFlags;
-        
+        public final SenderType senderType;
         
         
         /**
@@ -145,18 +159,25 @@ public class CommandHandler implements Listener {
          * @param optFlags
          */
         public CommandInfo(Method method, String permission,
-                String[] boolFlags, String[] optFlags) {
+                String[] boolFlags, String[] optFlags,SenderType senderType) {
             super();
             this.method = method;
             this.permission = permission;
             this.boolFlags = boolFlags;
             this.optFlags = optFlags;
+            this.senderType = senderType;
         }
 
 
 
         public Boolean execute(ArgumentPack pack){
             try {
+            	//enforce sender type validity
+            	if(pack == null){throw new IllegalArgumentException("MUST SUPPLY ARGUMENT PACK");}
+            	if(pack.getSender() != null && !senderType.isValid(pack.getSender())){
+            		pack.getSender().sendMessage("Command can only be executed by " + senderType.toString().toLowerCase());
+            		return true;
+            	}
                 return (Boolean) method.invoke(null, pack);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -173,5 +194,6 @@ public class CommandHandler implements Listener {
     public CommandInfo getInfo(String comm){
         return commandMap.get(comm);
     }
-
+    
+    
 }
