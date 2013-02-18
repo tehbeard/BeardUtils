@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
 
-import me.tehbeard.utils.expressions.functions.FunctionCatalogue;
-import me.tehbeard.utils.expressions.functions.FunctionProvider;
-import me.tehbeard.utils.expressions.functions.built.AvgFunction;
-import me.tehbeard.utils.expressions.functions.built.ModFunction;
-import me.tehbeard.utils.expressions.functions.built.SumFunction;
 
+import me.tehbeard.utils.expressions.functions.FunctionProvider;
 /**
  * infix expression parser
  * Supported operators: + - / * ^
