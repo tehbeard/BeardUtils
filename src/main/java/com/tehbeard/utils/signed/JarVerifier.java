@@ -62,9 +62,7 @@ public class JarVerifier {
             Certificate[] certs = je.getCertificates();
             if ((certs == null) || (certs.length == 0)) {
                 if (!je.getName().startsWith("META-INF"))
-                    throw new SecurityException("The JCE framework " +
-                            "has unsigned " +
-                            "class files.");
+                    throw new SecurityException("unsigned class files found.");
             } else {
                 // Check whether the file
                 // is signed as expected.
