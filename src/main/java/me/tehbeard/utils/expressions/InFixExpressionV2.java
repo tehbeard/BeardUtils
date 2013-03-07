@@ -203,7 +203,6 @@ public class InFixExpressionV2 {
                 try {
                     stack.push(funcProvider.resolveFunction(func, params));
                 } catch (UnresolvedFunctionException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                     return 0;
                 }
