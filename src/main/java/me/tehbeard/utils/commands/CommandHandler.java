@@ -55,7 +55,7 @@ public class CommandHandler implements Listener {
                     
                     CommandPermission cp = m.getAnnotation(CommandPermission.class);
                     String permission = "";
-                    if(cp!=null){permission = cp.permissionNode();}
+                    if(cp!=null){permission = cp.value();}
                     
                     CommandBooleanFlags cbf = m.getAnnotation(CommandBooleanFlags.class);
                     String[] _cbf = cbf!=null ? cbf.value(): new String[0];
