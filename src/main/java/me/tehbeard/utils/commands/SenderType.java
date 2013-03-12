@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 public enum SenderType{
 	CONSOLE(ConsoleCommandSender.class),
 	PLAYER(Player.class),
-	ALL(Player.class,ConsoleCommandSender.class);
+	ALL(CommandSender.class);
 	
 	
 	private Class<? extends CommandSender>[] valid;

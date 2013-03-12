@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -99,7 +97,9 @@ public class CommandHandler implements Listener {
     @EventHandler(priority=EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event){
         if(event.isCancelled()){return;}
-        executeCommand(event.getPlayer(),event.getMessage());
+        if(executeCommand(event.getPlayer(),event.getMessage())){
+        	event.setCancelled(true);
+        }
     }
     
     /**
@@ -117,15 +117,20 @@ public class CommandHandler implements Listener {
      * execute a command as sender
      * @param sender who to execute as
      * @param command command to execute, should NOT have leading /
+     * @return 
      */
-    public void executeCommand(CommandSender sender,String command){
+    public boolean executeCommand(CommandSender sender,String command){
         
         String cmd = command.split(" ")[0];
-        if(!commandMap.containsKey(cmd)){return;}
+        if(!commandMap.containsKey(cmd)){return false;}
 
-        CommandInfo c = commandMap.get(cmd);
-        if(!hasPermission(sender,c)){return;}
-
+        CommandInfo c = getInfo(cmd);
+        if(!hasPermission(sender,c)){return false;}
+        
+        if(!c.senderType.isValid(sender)){
+        	
+        	return false;
+        	}
 
         String[] raw = command.split(" ");
         String[] args = new String[raw.length - 1];
@@ -134,9 +139,9 @@ public class CommandHandler implements Listener {
             args[i-1]=raw[i];
         }
         
-        CommandInfo ci = getInfo(cmd);
-        ArgumentPack pack = new ArgumentPack(sender,ci.boolFlags, ci.optFlags, args);
-        c.execute(pack);
+        
+        ArgumentPack pack = new ArgumentPack(sender,c.boolFlags, c.optFlags, args);
+        return c.execute(pack);
     }
 
 
