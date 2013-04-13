@@ -19,6 +19,7 @@ import org.bukkit.Note;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.Statistic;
+import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.conversations.Conversation;
@@ -46,6 +47,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 public class FakePlayer implements Player {
@@ -1039,6 +1041,71 @@ public class FakePlayer implements Player {
     public void updateInventory() {
         // TODO Auto-generated method stub
 
+    }
+
+    public String getCustomName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean isCustomNameVisible() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void setCustomName(String arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setCustomNameVisible(boolean arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void resetMaxHealth() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setMaxHealth(int arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public WeatherType getPlayerWeather() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Scoreboard getScoreboard() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean isOnGround() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void resetPlayerWeather() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setPlayerWeather(WeatherType arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setScoreboard(Scoreboard arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setTexturePack(String arg0) {
+        // TODO Auto-generated method stub
+        
     }
 
 }
