@@ -201,4 +201,8 @@ public class CommandHandler implements Listener {
     }
     
     
+    public boolean removeCommand(String command){
+        return commandMap.remove(command) != null;
+    }
+    
 }

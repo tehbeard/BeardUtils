@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import me.tehbeard.utils.commands.ArgumentPack;
 import me.tehbeard.utils.commands.CommandHandler;
 import me.tehbeard.utils.commands.CommandHandler.CommandInfo;
 import me.tehbeard.utils.testSuite.fake.FakePlayer;
@@ -45,7 +44,7 @@ public class TestCommandHandler {
     @Test
     public void testArgPackPassing(){
         handler.addCommand(BCommand.class);
-        CommandInfo ci = handler.getInfo("create");
+        //CommandInfo ci = handler.getInfo("create");
         
         
         handler.executeCommand(new FakePlayer("bob"), "create steveAB -type creeper -a -c \"foo bar\"");
