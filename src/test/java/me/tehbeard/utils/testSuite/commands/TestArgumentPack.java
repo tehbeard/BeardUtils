@@ -20,11 +20,14 @@ foo bar
      */
     @Before
     public void setup(){
-        String arg = "create 1.5 -type creeper -a -c \"foo bar\"";
+        String arg = "create 1.5 -type creeper vechs -a -c \"foo bar\"";
         String[] bool = {"a"};
         String[] opt = {"type","c","d"};
         pack = new ArgumentPack(bool, opt,arg);
-
+        
+        for(int i =0;i<pack.size();i++){
+            System.out.println("" + i  + " : " + pack.get(i));
+        }
 
     }
 
@@ -44,6 +47,7 @@ foo bar
     @Test
     public void test_string(){
         assertTrue("Get first string argument",pack.get(0).equals("create"));
+        assertTrue("Get thrid string argument",pack.get(2).equals("vechs"));
         assertTrue(pack.getNumber(1).doubleValue()==1.5);
     }
 }
