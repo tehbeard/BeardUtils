@@ -28,12 +28,15 @@ public abstract class Injector<T,A extends Annotation> {
                 doInject(an,object, field);
                 field.setAccessible(false);
                 }catch(Exception exception){
-                    System.out.println("!COULD NOT INJECT!");
-                    exception.printStackTrace();
+                    onError(exception);
                 } 
             }
             
         }
+    }
+    
+    protected void onError(Exception e){
+        
     }
     
     protected abstract void doInject(A annotation,T object,Field field) throws IllegalArgumentException,IllegalAccessException;
