@@ -101,7 +101,8 @@ public class CommandHandler implements Listener {
         if(event.isCancelled()){return;}
         System.out.println("event fired " + event.getMessage());
         executeCommand(event.getPlayer(),event.getMessage().substring(1));
-        	event.setCancelled(true);
+        
+        event.setCancelled(commandMap.containsKey(event.getMessage().substring(1)));
         
     }
     
