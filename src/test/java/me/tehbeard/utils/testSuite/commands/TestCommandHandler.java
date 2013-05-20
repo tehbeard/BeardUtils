@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import me.tehbeard.utils.commands.CommandHandler;
-import me.tehbeard.utils.commands.CommandHandler.CommandInfo;
 import me.tehbeard.utils.testSuite.fake.FakePlayer;
 
 public class TestCommandHandler {
