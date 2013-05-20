@@ -40,6 +40,7 @@ public class CommandHandler implements Listener {
         for(Method m : executor.getMethods()){
             CommandDescriptor scrip = m.getAnnotation(CommandDescriptor.class);
             if(scrip != null){
+                System.out.println("FOUND A DESCRIPTOR");
                 if(!m.getReturnType().equals(boolean.class)){
                     throw new IllegalArgumentException(m.getName() + " Methods must return a boolean");
                 }
@@ -97,9 +98,10 @@ public class CommandHandler implements Listener {
     @EventHandler(priority=EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event){
         if(event.isCancelled()){return;}
-        if(executeCommand(event.getPlayer(),event.getMessage())){
+        System.out.println("event fired " + event.getMessage());
+        executeCommand(event.getPlayer(),event.getMessage().substring(1));
         	event.setCancelled(true);
-        }
+        
     }
     
     /**
@@ -125,7 +127,9 @@ public class CommandHandler implements Listener {
         if(!commandMap.containsKey(cmd)){return false;}
 
         CommandInfo c = getInfo(cmd);
-        if(!hasPermission(sender,c)){return false;}
+        if(!hasPermission(sender,c)){
+            sender.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
+            return false;}
         
         if(!c.senderType.isValid(sender)){
         	
