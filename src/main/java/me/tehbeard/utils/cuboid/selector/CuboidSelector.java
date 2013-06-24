@@ -66,6 +66,7 @@ public class CuboidSelector implements Listener{
         
         return isActive(player);
     }
+    @SuppressWarnings("incomplete-switch")
     @EventHandler
     public void click(PlayerInteractEvent event){
         String player = event.getPlayer().getName();

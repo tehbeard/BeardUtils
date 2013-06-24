@@ -74,7 +74,6 @@ public class TestYaml {
                 System.out.println("List of: " + o.getClass().getSimpleName());
             }
         } catch (InvalidConfigurationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }*/
