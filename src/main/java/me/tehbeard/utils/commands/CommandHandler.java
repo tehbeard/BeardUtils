@@ -26,8 +26,11 @@ public class CommandHandler implements Listener {
 
     public Map<String,CommandInfo> commandMap;
 
-    public CommandHandler(){
+    public Plugin plugin;
+
+    public CommandHandler(Plugin plugin){
         commandMap = new HashMap<String, CommandInfo>();
+        this.plugin = plugin;
     }
 
 
@@ -81,6 +84,7 @@ public class CommandHandler implements Listener {
                         }
                     }
                     if(tag==null){System.out.println("Could not add CommandExecutor, name + aliases already taken for " + scrip.label() );}
+                    //TODO - Check if Registered in plugin.yml, and if so bind to that instead
                     commandMap.put(tag, ci);
                 }
                 else
