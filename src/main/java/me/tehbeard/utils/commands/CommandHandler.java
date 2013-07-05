@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Processes commands inputed by a user
