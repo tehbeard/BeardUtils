@@ -50,6 +50,7 @@ public abstract class InvMenu implements InventoryHolder, Listener{
         }
     }
     
+    @SuppressWarnings("deprecation")
     @EventHandler(priority=EventPriority.HIGHEST)
     public void onPaintEvent(InventoryDragEvent event){
         if(event.getInventory().getHolder() != this){
