@@ -177,6 +177,8 @@ public class InFixExpressionV2 {
 	 */
 	public int getValue(VariableProvider varProvider,FunctionProvider funcProvider){
 		Stack<Integer> workingStack = new Stack<Integer>();  
+		
+		int stackCountModifier = 0;
 
 		Iterator<String> it = rules.iterator();
 		while(it.hasNext()){
@@ -200,6 +202,9 @@ public class InFixExpressionV2 {
 			case '@':{
 				String func = exp.substring(1);
 				int pc = workingStack.pop();
+				
+				pc += stackCountModifier; stackCountModifier = 0;//Add modifier and reset
+				
 				if(workingStack.size() < pc){throw new IllegalStateException("Invalid number of parameters left on stack");}
 				int[] params = new int[pc];
 				for(int ii =0;ii<pc;ii++){
@@ -218,7 +223,9 @@ public class InFixExpressionV2 {
 				if(varProvider==null){
 					throw new IllegalStateException("Expression contains a reference, no variable provider available.");
 				}else{
-					for(int ii : varProvider.resolveReference(array)){
+					int[] arr = varProvider.resolveReference(array);
+					stackCountModifier += arr.length - 1;
+					for(int ii : arr){
 						workingStack.push(ii);System.out.println("pushing " + ii);
 					}
 				}
