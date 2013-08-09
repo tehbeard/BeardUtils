@@ -1,8 +1,10 @@
 package me.tehbeard.utils.expressions.functions.built;
 
 import me.tehbeard.utils.expressions.UnresolvedFunctionException;
+import me.tehbeard.utils.expressions.functions.Function;
 import me.tehbeard.utils.expressions.functions.FunctionProvider;
 
+@Function("min")
 public class MinFunction implements FunctionProvider {
 
     public int resolveFunction(String function, int[] params)

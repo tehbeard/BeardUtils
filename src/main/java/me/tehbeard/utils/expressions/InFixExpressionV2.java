@@ -226,7 +226,7 @@ public class InFixExpressionV2 {
 					int[] arr = varProvider.resolveReference(array);
 					stackCountModifier += arr.length - 1;
 					for(int ii : arr){
-						workingStack.push(ii);System.out.println("pushing " + ii);
+						workingStack.push(ii);
 					}
 				}
 				break;
