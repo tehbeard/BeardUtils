@@ -13,4 +13,6 @@ public interface VariableProvider {
      * @return
      */
     public int resolveVariable(String var);
+
+	public int[] resolveReference(String array);
 }
