@@ -50,7 +50,7 @@ public class ExpressionTest {
 			}
 		};
 		
-		String expr = "@avg(#b)";
+		String expr = "@avg(#b) + (5*5)";
 		InFixExpressionV2 i = new InFixExpressionV2(expr);
 		assertEquals("reference test",29,i.getValue(provider, new AvgFunction()));
     }

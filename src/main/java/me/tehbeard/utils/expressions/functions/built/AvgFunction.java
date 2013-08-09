@@ -11,8 +11,6 @@ public class AvgFunction implements FunctionProvider {
         int i = 0;
         for(int k : params){
             i+=k;
-            System.out.println("adding " + k + ", total " + i);
-            
         }
         return i/params.length;
     }
