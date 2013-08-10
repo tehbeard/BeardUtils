@@ -11,29 +11,31 @@ import java.util.List;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-
-
 /**
- * Represents a generic addon loader 
- * AddonLoader provides a mechanism for plugins to load small amounts of code from jars, without having to use bukkit plugins
- * Examples of use could be to load a custom developed class for performing an action (such as a trigger, or a spell) 
- * Each addon loader must be for a specific type of class.
+ * Represents a generic addon loader AddonLoader provides a mechanism for
+ * plugins to load small amounts of code from jars, without having to use bukkit
+ * plugins Examples of use could be to load a custom developed class for
+ * performing an action (such as a trigger, or a spell) Each addon loader must
+ * be for a specific type of class.
  */
 public abstract class AddonLoader<T> {
 
     /**
-     * Directory addons are located under
-     * NOTE: sub-directories are not searched. 
+     * Directory addons are located under NOTE: sub-directories are not
+     * searched.
      */
-    private File dir;
+    private File           dir;
     private URLClassLoader loader;
-    private Class<T> addonClass;
+    private Class<T>       addonClass;
+
     /**
      * 
-     * @param dir directory addons are located in
-     * @param addonClass main class/interface Addons are based off of 
+     * @param dir
+     *            directory addons are located in
+     * @param addonClass
+     *            main class/interface Addons are based off of
      */
-    public AddonLoader(File dir,Class<T> addonClass) {
+    public AddonLoader(File dir, Class<T> addonClass) {
         this.addonClass = addonClass;
         this.dir = dir;
 
@@ -47,8 +49,9 @@ public abstract class AddonLoader<T> {
      */
     public void loadAddons() {
         // get list of files
-        String[] flist = dir.list(new FilenameFilter() {
+        String[] flist = this.dir.list(new FilenameFilter() {
 
+            @Override
             public boolean accept(File file, String filename) {
                 return !(file.isFile() && filename.endsWith(".jar"));
             }
@@ -56,11 +59,11 @@ public abstract class AddonLoader<T> {
         List<String> classList = new ArrayList<String>();
         ZipFile addon;
         URL[] urls = new URL[flist.length];
-        int i =0;
+        int i = 0;
 
         for (String file : flist) {
 
-            File addonFile = new File(dir, file);
+            File addonFile = new File(this.dir, file);
 
             try {
                 urls[i] = addonFile.toURI().toURL();
@@ -71,18 +74,17 @@ public abstract class AddonLoader<T> {
             }
             i++;
 
-
             try {
                 addon = new ZipFile(addonFile);
 
                 classList.addAll(getClassList(addon));
 
-                loader = new URLClassLoader(urls,getClass().getClassLoader());
+                this.loader = new URLClassLoader(urls, getClass().getClassLoader());
 
-                for(String t :classList){
+                for (String t : classList) {
                     try {
-                        Class<?> c = loader.loadClass(t);
-                        if(c!=null && addonClass.isAssignableFrom(c) ){
+                        Class<?> c = this.loader.loadClass(t);
+                        if ((c != null) && this.addonClass.isAssignableFrom(c)) {
                             @SuppressWarnings("unchecked")
                             Class<T> tc = (Class<T>) c;
                             makeClass(tc);
@@ -91,7 +93,6 @@ public abstract class AddonLoader<T> {
                         System.out.println("Could not find class! " + t);
                         e.printStackTrace();
                     }
-
 
                 }
 
@@ -105,12 +106,16 @@ public abstract class AddonLoader<T> {
 
     /**
      * Called to initialise an addon after it has been loaded
-     * @param classType class to initialise
+     * 
+     * @param classType
+     *            class to initialise
      */
     public abstract void makeClass(Class<? extends T> classType);
 
     /**
-     * Takes the ZipFile of an addon and returns a list of the classes to load from it
+     * Takes the ZipFile of an addon and returns a list of the classes to load
+     * from it
+     * 
      * @param file
      * @return
      */

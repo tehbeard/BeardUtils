@@ -4,11 +4,11 @@ import me.tehbeard.utils.expressions.UnresolvedFunctionException;
 
 /**
  * Provides functions to an expression
+ * 
  * @author James
- *
+ * 
  */
 public interface FunctionProvider {
 
-    
-    public int resolveFunction(String function,int[] params) throws UnresolvedFunctionException;
+    public int resolveFunction(String function, int[] params) throws UnresolvedFunctionException;
 }

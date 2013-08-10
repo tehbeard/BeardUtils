@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Locates classes in a collection of classpaths based on 
+ * Locates classes in a collection of classpaths based on
+ * 
  * @author James
- *
+ * 
  */
 public class ClassDiscoverer {
-    
+
     List<URL> classpaths = new ArrayList<URL>();
 
 }

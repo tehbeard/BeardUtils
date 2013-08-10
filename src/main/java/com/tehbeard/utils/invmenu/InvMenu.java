@@ -15,57 +15,57 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * Class to add gui menus to minecraft using inventories
+ * 
  * @author James
- *
+ * 
  */
-public abstract class InvMenu implements InventoryHolder, Listener{
+public abstract class InvMenu implements InventoryHolder, Listener {
 
     private Inventory inv;
-    
-    public InvMenu(Plugin plugin,int rows,String title){
+
+    public InvMenu(Plugin plugin, int rows, String title) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        inv = Bukkit.createInventory(this, Math.max(0,Math.min(rows,6))*9, title);
+        this.inv = Bukkit.createInventory(this, Math.max(0, Math.min(rows, 6)) * 9, title);
     }
-    
-    public void cleanup(){
+
+    public void cleanup() {
         HandlerList.unregisterAll(this);
     }
-    
-    
+
+    @Override
     public Inventory getInventory() {
-        return inv;
+        return this.inv;
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority=EventPriority.HIGHEST)
-    public void onClick(InventoryClickEvent event){
-        if(event.getInventory().getHolder() != this){
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onClick(InventoryClickEvent event) {
+        if (event.getInventory().getHolder() != this) {
             return;
         }
         event.setCancelled(true);
         onEvent(event);
-        
-        for(HumanEntity he : event.getViewers()){
-            ((Player)he).updateInventory();
+
+        for (HumanEntity he : event.getViewers()) {
+            ((Player) he).updateInventory();
         }
     }
-    
+
     @SuppressWarnings("deprecation")
-    @EventHandler(priority=EventPriority.HIGHEST)
-    public void onPaintEvent(InventoryDragEvent event){
-        if(event.getInventory().getHolder() != this){
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPaintEvent(InventoryDragEvent event) {
+        if (event.getInventory().getHolder() != this) {
             return;
         }
         event.setCancelled(true);
         onPaint(event);
-        
-        for(HumanEntity he : event.getViewers()){
-            ((Player)he).updateInventory();
+
+        for (HumanEntity he : event.getViewers()) {
+            ((Player) he).updateInventory();
         }
     }
-    
-    protected abstract void onPaint(InventoryDragEvent event);
 
+    protected abstract void onPaint(InventoryDragEvent event);
 
     protected abstract void onEvent(InventoryClickEvent event);
 }

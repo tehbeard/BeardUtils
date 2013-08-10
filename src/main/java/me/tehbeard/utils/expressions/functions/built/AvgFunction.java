@@ -7,14 +7,16 @@ import me.tehbeard.utils.expressions.functions.FunctionProvider;
 @Function("avg")
 public class AvgFunction implements FunctionProvider {
 
-    public int resolveFunction(String function, int[] params)
-            throws UnresolvedFunctionException {
-        if(!function.equalsIgnoreCase("avg")){throw new UnresolvedFunctionException();}
-        int i = 0;
-        for(int k : params){
-            i+=k;
+    @Override
+    public int resolveFunction(String function, int[] params) throws UnresolvedFunctionException {
+        if (!function.equalsIgnoreCase("avg")) {
+            throw new UnresolvedFunctionException();
         }
-        return i/params.length;
+        int i = 0;
+        for (int k : params) {
+            i += k;
+        }
+        return i / params.length;
     }
 
 }

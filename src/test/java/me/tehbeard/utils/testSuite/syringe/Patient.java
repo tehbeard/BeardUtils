@@ -6,6 +6,9 @@ public class Patient {
 
     @Inject
     String name = "john";
-    
-    public String toString(){return name;}
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

@@ -13,14 +13,14 @@ import java.util.jar.Manifest;
 
 /**
  * Verifies a signed jar file given an array of truted CA certs
- *
+ * 
  * @author Andrew Harrison
  * @version $Revision: 148 $
  * @created Apr 11, 2007: 11:02:26 PM
- * @date $Date: 2007-04-12 13:31:48 +0100 (Thu, 12 Apr 2007) $ modified by $Author: scmabh $
+ * @date $Date: 2007-04-12 13:31:48 +0100 (Thu, 12 Apr 2007) $ modified by
+ *       $Author: scmabh $
  * @todo Put your notes here...
  */
-
 
 public class JarVerifier {
 
@@ -29,8 +29,9 @@ public class JarVerifier {
 
         // Ensure there is a manifest file
         Manifest man = jf.getManifest();
-        if (man == null)
+        if (man == null) {
             throw new SecurityException("The JAR is not signed");
+        }
 
         // Ensure all the entries' signatures verify correctly
         byte[] buffer = new byte[8192];
@@ -41,10 +42,10 @@ public class JarVerifier {
             entriesVec.addElement(je);
             InputStream is = jf.getInputStream(je);
             @SuppressWarnings("unused")
-			int n;
+            int n;
             while ((n = is.read(buffer, 0, buffer.length)) != -1) {
                 // we just read. this will throw a SecurityException
-                // if  a signature/digest check fails.
+                // if a signature/digest check fails.
             }
             is.close();
         }
@@ -55,14 +56,16 @@ public class JarVerifier {
         while (e.hasMoreElements()) {
             JarEntry je = e.nextElement();
 
-            if (je.isDirectory())
+            if (je.isDirectory()) {
                 continue;
+            }
             // Every file must be signed - except
             // files in META-INF
             Certificate[] certs = je.getCertificates();
             if ((certs == null) || (certs.length == 0)) {
-                if (!je.getName().startsWith("META-INF"))
+                if (!je.getName().startsWith("META-INF")) {
                     throw new SecurityException("unsigned class files found.");
+                }
             } else {
                 // Check whether the file
                 // is signed as expected.
@@ -88,8 +91,7 @@ public class JarVerifier {
         }
     }
 
-    public static boolean isTrusted(X509Certificate cert,
-                                     X509Certificate[] trustedCaCerts) {
+    public static boolean isTrusted(X509Certificate cert, X509Certificate[] trustedCaCerts) {
         // Return true iff either of the following is true:
         // 1) the cert is in the trustedCaCerts.
         // 2) the cert is issued by a trusted CA.
@@ -130,9 +132,8 @@ public class JarVerifier {
     public static X509Certificate[] getChainRoots(Certificate[] certs) {
         Vector<X509Certificate> result = new Vector<X509Certificate>(3);
         // choose a Vector size that seems reasonable
-        for (int i = 0; i < certs.length - 1; i++) {
-            if (!((X509Certificate) certs[i + 1]).getSubjectDN().equals(
-                    ((X509Certificate) certs[i]).getIssuerDN())) {
+        for (int i = 0; i < (certs.length - 1); i++) {
+            if (!((X509Certificate) certs[i + 1]).getSubjectDN().equals(((X509Certificate) certs[i]).getIssuerDN())) {
                 // We've reached the end of a chain
                 result.addElement((X509Certificate) certs[i]);
             }

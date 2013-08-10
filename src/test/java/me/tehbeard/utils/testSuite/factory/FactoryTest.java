@@ -1,53 +1,45 @@
 package me.tehbeard.utils.testSuite.factory;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import me.tehbeard.utils.factory.ConfigurableFactory;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import me.tehbeard.utils.factory.ConfigurableFactory;
-
 public class FactoryTest {
 
-	
-	
-		
-	
+    private ConfigurableFactory<TestPattern, FactoryTag> factory;
 
-	
+    @Before
+    public void setup() {
+        this.factory = new ConfigurableFactory<TestPattern, FactoryTag>(FactoryTag.class) {
 
-	private ConfigurableFactory<TestPattern, FactoryTag> factory;
-	
-	@Before
-	public void setup(){
-		factory = new ConfigurableFactory<TestPattern, FactoryTag>(FactoryTag.class) {
-			
-			@Override
-			public String getTag(FactoryTag annotation) {
-				return annotation.value();
-			}
-		};
-		
-		factory.addProduct(Alpha.class);
-		factory.addProduct(Beta.class);
-		factory.addProduct(Gamma.class);
-		
-	}
-	
-	@Test
-	public void testFactoryGet(){
-		
-		assertTrue("alpha",factory.getProduct("alpha") instanceof Alpha);
-		
-		assertTrue("beta",factory.getProduct("beta") instanceof Beta);
-		
-		assertTrue("gamma",factory.getProduct("gamma") instanceof Gamma);
-		
-		assertFalse("delta",factory.getProduct("delta") instanceof Gamma);
-		
-		assertFalse(factory.getProduct("alpha") instanceof Gamma);
-		
-		
-	}
-	
+            @Override
+            public String getTag(FactoryTag annotation) {
+                return annotation.value();
+            }
+        };
+
+        this.factory.addProduct(Alpha.class);
+        this.factory.addProduct(Beta.class);
+        this.factory.addProduct(Gamma.class);
+
+    }
+
+    @Test
+    public void testFactoryGet() {
+
+        assertTrue("alpha", this.factory.getProduct("alpha") instanceof Alpha);
+
+        assertTrue("beta", this.factory.getProduct("beta") instanceof Beta);
+
+        assertTrue("gamma", this.factory.getProduct("gamma") instanceof Gamma);
+
+        assertFalse("delta", this.factory.getProduct("delta") instanceof Gamma);
+
+        assertFalse(this.factory.getProduct("alpha") instanceof Gamma);
+
+    }
+
 }

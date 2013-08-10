@@ -7,11 +7,12 @@ import java.lang.annotation.Target;
 
 /**
  * Specifies the location of the data to inject
+ * 
  * @author James
- *
+ * 
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface InjectConfig {
-String value();
+    String value();
 }
