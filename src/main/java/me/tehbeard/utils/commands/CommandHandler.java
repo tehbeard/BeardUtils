@@ -6,7 +6,10 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,11 +30,8 @@ public class CommandHandler implements Listener {
 
     public Map<String, CommandInfo> commandMap;
 
-    public Plugin                   plugin;
-
-    public CommandHandler(Plugin plugin) {
+    public CommandHandler() {
         this.commandMap = new HashMap<String, CommandInfo>();
-        this.plugin = plugin;
     }
 
     /**
@@ -93,7 +93,13 @@ public class CommandHandler implements Listener {
                     }
                     // TODO - Check if Registered in plugin.yml, and if so bind
                     // to that instead
-                    this.commandMap.put(tag, ci);
+                    if(Bukkit.getPluginCommand(tag) != null){
+                        Bukkit.getPluginCommand(tag).setExecutor(ci);
+                    }
+                    else
+                    {
+                        this.commandMap.put(tag, ci);
+                    }
                 } else {
                     throw new IllegalStateException("Command " + scrip.label() + " Must be a static method");
                 }
@@ -164,15 +170,14 @@ public class CommandHandler implements Listener {
             args[i - 1] = raw[i];
         }
 
-        ArgumentPack pack = new ArgumentPack(sender, c.boolFlags, c.optFlags, args);
-        return c.execute(pack);
+        return c.onCommand(sender, null, raw[0],args);
     }
 
     private boolean hasPermission(Permissible p, CommandInfo executor) {
         return p.hasPermission(executor.permission) || (executor.permission == "");
     }
 
-    public class CommandInfo {
+    public class CommandInfo implements CommandExecutor {
         private final Method    method;
         public final String     permission;
         public final String[]   boolFlags;
@@ -215,6 +220,11 @@ public class CommandHandler implements Listener {
                 e.printStackTrace();
             }
             return false;
+        }
+
+        @Override
+        public boolean onCommand(CommandSender sender, Command cmd, String cmdlbl, String[] args) {
+            return execute(new ArgumentPack(sender, boolFlags, optFlags, args));
         }
 
     }
