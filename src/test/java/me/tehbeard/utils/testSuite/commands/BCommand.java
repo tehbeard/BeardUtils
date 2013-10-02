@@ -16,7 +16,7 @@ public class BCommand {
         System.out.println("Type: " + pack.getOption("type"));
         System.out.println("C   : " + pack.getOption("c"));
         System.out.println("A   : " + pack.getFlag("a"));
-
+        pack.getSender().sendMessage("SUCCESS");
         return true;
     }
 }

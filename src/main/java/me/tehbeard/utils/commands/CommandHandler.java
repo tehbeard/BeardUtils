@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,9 +30,16 @@ import org.bukkit.plugin.Plugin;
 public class CommandHandler implements Listener {
 
     public Map<String, CommandInfo> commandMap;
+    private Server server;
+    
+    public CommandHandler(Server server) {
+        this.commandMap = new HashMap<String, CommandInfo>();
+        this.server = server;
+    }
 
     public CommandHandler() {
         this.commandMap = new HashMap<String, CommandInfo>();
+        this.server = Bukkit.getServer();
     }
 
     /**
@@ -93,8 +101,8 @@ public class CommandHandler implements Listener {
                     }
                     // TODO - Check if Registered in plugin.yml, and if so bind
                     // to that instead
-                    if(Bukkit.getPluginCommand(tag) != null){
-                        Bukkit.getPluginCommand(tag).setExecutor(ci);
+                    if(server.getPluginCommand(tag) != null){
+                        server.getPluginCommand(tag).setExecutor(ci);
                     }
                     else
                     {
