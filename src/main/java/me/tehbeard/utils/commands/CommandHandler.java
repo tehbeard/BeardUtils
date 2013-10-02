@@ -54,7 +54,6 @@ public class CommandHandler implements Listener {
         for (Method m : executor.getMethods()) {
             CommandDescriptor scrip = m.getAnnotation(CommandDescriptor.class);
             if (scrip != null) {
-                System.out.println("FOUND A DESCRIPTOR");
                 if (!m.getReturnType().equals(boolean.class)) {
                     throw new IllegalArgumentException(m.getName() + " Methods must return a boolean");
                 }
@@ -96,11 +95,10 @@ public class CommandHandler implements Listener {
                         }
                     }
                     if (tag == null) {
-                        System.out.println("Could not add CommandExecutor, name + aliases already taken for "
+                       throw new IllegalStateException("Could not add CommandExecutor, name + aliases already taken for "
                                 + scrip.label());
                     }
-                    // TODO - Check if Registered in plugin.yml, and if so bind
-                    // to that instead
+
                     if(server.getPluginCommand(tag) != null){
                         server.getPluginCommand(tag).setExecutor(ci);
                     }
