@@ -3,7 +3,9 @@ package me.tehbeard.utils.commands;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -18,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.permissions.Permissible;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Processes commands inputed by a user Currently supports
@@ -49,7 +50,9 @@ public class CommandHandler implements Listener {
      *            executor to add
      * @return true if added, false if not
      */
-    public void addCommand(Class<?> executor) {
+    public List<CommandInfo> addCommand(Class<?> executor) {
+        
+        List<CommandInfo> commands = new ArrayList<CommandInfo>();
 
         for (Method m : executor.getMethods()) {
             CommandDescriptor scrip = m.getAnnotation(CommandDescriptor.class);
@@ -81,7 +84,7 @@ public class CommandHandler implements Listener {
                     CommandOptionFlags cof = m.getAnnotation(CommandOptionFlags.class);
                     String[] _cof = cof != null ? cof.value() : new String[0];
 
-                    CommandInfo ci = new CommandInfo(m, permission, _cbf, _cof, scrip.senderType());
+                    
 
                     String tag = null;
                     if (!this.commandMap.containsKey(scrip.label())) {
@@ -98,20 +101,27 @@ public class CommandHandler implements Listener {
                        throw new IllegalStateException("Could not add CommandExecutor, name + aliases already taken for "
                                 + scrip.label());
                     }
+                    
+                    CommandInfo ci = new CommandInfo(tag,m, permission, _cbf, _cof, scrip.senderType());
 
                     if(server.getPluginCommand(tag) != null){
+                        System.out.println(tag + " bound to PluginCommand");
                         server.getPluginCommand(tag).setExecutor(ci);
+                        ci.isRealCommand = true;
                     }
                     else
                     {
+                        System.out.println(tag + " running as preprocess command");
                         this.commandMap.put(tag, ci);
                     }
+                    commands.add(ci);
                 } else {
                     throw new IllegalStateException("Command " + scrip.label() + " Must be a static method");
                 }
             }
 
         }
+        return commands;
     }
 
     /**
@@ -125,9 +135,8 @@ public class CommandHandler implements Listener {
             return;
         }
         System.out.println("event fired " + event.getMessage());
-        executeCommand(event.getPlayer(), event.getMessage().substring(1));
 
-        event.setCancelled(this.commandMap.containsKey(event.getMessage().substring(1)));
+        event.setCancelled(executeCommand(event.getPlayer(), event.getMessage().substring(1)));
 
     }
 
@@ -184,11 +193,13 @@ public class CommandHandler implements Listener {
     }
 
     public class CommandInfo implements CommandExecutor {
+        public final String     label;
         private final Method    method;
         public final String     permission;
         public final String[]   boolFlags;
         public final String[]   optFlags;
         public final SenderType senderType;
+        public boolean    isRealCommand = false;
 
         /**
          * @param method
@@ -196,9 +207,10 @@ public class CommandHandler implements Listener {
          * @param boolFlags
          * @param optFlags
          */
-        public CommandInfo(Method method, String permission, String[] boolFlags, String[] optFlags,
+        public CommandInfo(String label,Method method, String permission, String[] boolFlags, String[] optFlags,
                 SenderType senderType) {
             super();
+            this.label = label;
             this.method = method;
             this.permission = permission;
             this.boolFlags = boolFlags;
@@ -238,9 +250,15 @@ public class CommandHandler implements Listener {
     public CommandInfo getInfo(String comm) {
         return this.commandMap.get(comm);
     }
-
-    public boolean removeCommand(String command) {
-        return this.commandMap.remove(command) != null;
+    
+    public void removeCommand(CommandInfo command){
+        if(command.isRealCommand){
+            server.getPluginCommand(command.label).setExecutor(null);
+        }
+        else
+        {
+            commandMap.remove(command.label);
+        }
     }
 
 }

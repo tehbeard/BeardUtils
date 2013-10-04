@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
  */
 public class SessionStore<T> implements Listener {
 
-    Map<String, T> sessions;
+    private Map<String, T> sessions;
 
     public SessionStore() {
         this.sessions = new HashMap<String, T>();
@@ -60,6 +60,10 @@ public class SessionStore<T> implements Listener {
     @EventHandler
     public void logout(PlayerQuitEvent e) {
         clearSession(e.getPlayer().getName());
+    }
+    
+    public Map<String, T> getMap(){
+        return sessions;
     }
 
 }
