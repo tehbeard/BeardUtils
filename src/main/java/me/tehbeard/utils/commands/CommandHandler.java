@@ -43,6 +43,10 @@ public class CommandHandler implements Listener {
         this.server = Bukkit.getServer();
     }
 
+    
+    public List<CommandInfo> addCommand(Class<?> executor){
+        return addCommand(executor,null);
+    }
     /**
      * Add a command executor to this handler
      * 
@@ -50,7 +54,7 @@ public class CommandHandler implements Listener {
      *            executor to add
      * @return true if added, false if not
      */
-    public List<CommandInfo> addCommand(Class<?> executor) {
+    public List<CommandInfo> addCommand(Class<?> executor,Object instance) {
         
         List<CommandInfo> commands = new ArrayList<CommandInfo>();
 
@@ -60,7 +64,6 @@ public class CommandHandler implements Listener {
                 if (!m.getReturnType().equals(boolean.class)) {
                     throw new IllegalArgumentException(m.getName() + " Methods must return a boolean");
                 }
-                if (Modifier.isStatic(m.getModifiers())) {
                     Class<?>[] params = m.getParameterTypes();
                     if (params.length != 1) {
                         throw new IllegalArgumentException("Invalid number of parameters for function handling "
@@ -102,7 +105,7 @@ public class CommandHandler implements Listener {
                                 + scrip.label());
                     }
                     
-                    CommandInfo ci = new CommandInfo(tag,m, permission, _cbf, _cof, scrip.senderType());
+                    CommandInfo ci = new CommandInfo(tag,instance,m, permission, _cbf, _cof, scrip.senderType());
 
                     if(server.getPluginCommand(tag) != null){
                         System.out.println(tag + " bound to PluginCommand");
@@ -115,9 +118,6 @@ public class CommandHandler implements Listener {
                         this.commandMap.put(tag, ci);
                     }
                     commands.add(ci);
-                } else {
-                    throw new IllegalStateException("Command " + scrip.label() + " Must be a static method");
-                }
             }
 
         }
@@ -193,7 +193,9 @@ public class CommandHandler implements Listener {
     }
 
     public class CommandInfo implements CommandExecutor {
+        
         public final String     label;
+        private final Object    object;
         private final Method    method;
         public final String     permission;
         public final String[]   boolFlags;
@@ -207,10 +209,11 @@ public class CommandHandler implements Listener {
          * @param boolFlags
          * @param optFlags
          */
-        public CommandInfo(String label,Method method, String permission, String[] boolFlags, String[] optFlags,
+        public CommandInfo(String label,Object object,Method method, String permission, String[] boolFlags, String[] optFlags,
                 SenderType senderType) {
             super();
             this.label = label;
+            this.object = object;
             this.method = method;
             this.permission = permission;
             this.boolFlags = boolFlags;
@@ -229,7 +232,7 @@ public class CommandHandler implements Listener {
                             "Command can only be executed by " + this.senderType.toString().toLowerCase());
                     return true;
                 }
-                return (Boolean) this.method.invoke(null, pack);
+                return (Boolean) this.method.invoke(object, pack);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (IllegalArgumentException e) {
