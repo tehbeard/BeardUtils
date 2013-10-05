@@ -27,7 +27,9 @@ public class YamlConfigInjector extends Injector<Object, InjectConfig> {
     protected void doInject(InjectConfig annotation, Object object, Field field) throws IllegalArgumentException,
             IllegalAccessException {
         Object value = this.section.get(annotation.value());
+        if(value != null){
         field.set(object, value);
+        }
 
     }
 
