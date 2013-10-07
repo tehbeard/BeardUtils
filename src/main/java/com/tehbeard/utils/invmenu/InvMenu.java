@@ -15,13 +15,14 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * Class to add gui menus to minecraft using inventories
- * 
+ *
  * @author James
- * 
+ *
  */
-public abstract class InvMenu implements InventoryHolder, Listener {
+public final class InvMenu implements InventoryHolder, Listener {
 
     private Inventory inv;
+    private IMenuHandler handler;
 
     public InvMenu(Plugin plugin, int rows, String title) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -44,7 +45,7 @@ public abstract class InvMenu implements InventoryHolder, Listener {
             return;
         }
         event.setCancelled(true);
-        onEvent(event);
+        getHandler().onEvent(event);
 
         for (HumanEntity he : event.getViewers()) {
             ((Player) he).updateInventory();
@@ -58,14 +59,31 @@ public abstract class InvMenu implements InventoryHolder, Listener {
             return;
         }
         event.setCancelled(true);
-        onPaint(event);
+        getHandler().onPaint(event);
 
         for (HumanEntity he : event.getViewers()) {
             ((Player) he).updateInventory();
         }
     }
 
-    protected abstract void onPaint(InventoryDragEvent event);
+    /**
+     * @return the handler
+     */
+    public IMenuHandler getHandler() {
+        return handler;
+    }
 
-    protected abstract void onEvent(InventoryClickEvent event);
+    /**
+     * @param handler the handler to set
+     */
+    public void setHandler(IMenuHandler handler) {
+        this.handler = handler;
+    }
+
+    public interface IMenuHandler {
+
+        public void onPaint(InventoryDragEvent event);
+
+        public void onEvent(InventoryClickEvent event);
+    }
 }
