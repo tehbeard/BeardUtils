@@ -16,5 +16,10 @@ public interface VariableProvider {
      */
     public int resolveVariable(String var);
 
+    /**
+     * Returns a number of variables linked to a reference.
+     * @param array
+     * @return 
+     */
     public int[] resolveReference(String array);
 }
