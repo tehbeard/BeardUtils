@@ -14,10 +14,6 @@ import com.tehbeard.utils.misc.CallbackMatcher;
 import com.tehbeard.utils.misc.CallbackMatcher.Callback;
 import java.io.File;
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,8 +37,9 @@ public abstract class JDBCDataSource {
     private final String connectionUrl;
     private final Properties connectionProperties;
     protected final String scriptSuffix;
+    private final Properties sqlFragments;
 
-    public JDBCDataSource(String connectionUrl, Properties connectionProperties, String type, String driverClass, Logger logger) throws ClassNotFoundException {
+    public JDBCDataSource(String connectionUrl, Properties connectionProperties, Properties sqlFragments,String type, String driverClass, Logger logger) throws ClassNotFoundException {
         try {
             Class.forName(driverClass);// load driver
             this.logger = logger;
@@ -53,6 +50,7 @@ public abstract class JDBCDataSource {
         }
         this.connectionUrl = connectionUrl;
         this.connectionProperties = connectionProperties;
+        this.sqlFragments = sqlFragments;
     }
 
     public void setup() throws SQLException {
@@ -75,6 +73,15 @@ public abstract class JDBCDataSource {
                         try {
                             SQLScript script = f.getAnnotation(SQLScript.class);
                             f.set(this, getStatementFromScript(script.value(), script.flags()));
+                        } catch (IllegalArgumentException ex) {
+                            Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }else if (f.isAnnotationPresent(SQLFragment.class)) {
+                        try {
+                            SQLFragment script = f.getAnnotation(SQLFragment.class);
+                            f.set(this, this.connection.prepareStatement(sqlFragments.getProperty(script.value() + "." + scriptSuffix), script.flags()));
                         } catch (IllegalArgumentException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (IllegalAccessException ex) {
@@ -203,6 +210,8 @@ public abstract class JDBCDataSource {
      */
     protected abstract boolean restoreBackup(File file);
     
+    protected abstract File getTempDir();
+    
     /**
      * Return the migration script path.
      * @param fromVersion
@@ -211,16 +220,37 @@ public abstract class JDBCDataSource {
      */
     protected abstract String getMigrationScriptPath(int fromVersion, int toVersion);
 
-    public void doMigration(int fromVersion, int toVersion) {
+    public void doMigration(int fromVersion, int toVersion) throws SQLException {
         //TODO - Add migration handler
-        
         //Do backup
-        //Disable autocommit
-        //for(i = from -> to)
-        ////Run preupgrade methods
-        ////run script
-        ////run postupgrade method
-        ////commit
+        File backupFile = new File(getTempDir(),"backup.db");
+        if(!generateBackup(backupFile)){
+            logger.severe("Failed to generate backup file, aborting migration");
+            throw new SQLException("Backup generation failed.");
+        }
+        
+        connection.setAutoCommit(false);
+        for(int migratingTo = fromVersion+1;migratingTo<=toVersion;migratingTo++){
+            try {
+                runCodeFor(migratingTo, PreUpgrade.class);
+                executeScript(getMigrationScriptPath(fromVersion, toVersion));
+                runCodeFor(migratingTo, PostUpgrade.class);
+                
+                connection.commit();
+            }
+            //Enable autocommit
+            //If error, rollback, restore backup
+            catch (Exception ex) {
+                Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                connection.rollback();
+                restoreBackup(backupFile);
+            }
+            finally{
+                connection.setAutoCommit(true);
+            }
+        }
+        
+        
         //Enable autocommit
         
         //If error, rollback, restore backup
@@ -236,25 +266,5 @@ public abstract class JDBCDataSource {
                 }
             }
         }
-    }
-
-    /**
-     * DBVersion annotation
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface DBVersion {
-
-        int value();
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface PreUpgrade {
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface PostUpgrade {
     }
 }
