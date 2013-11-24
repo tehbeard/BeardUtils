@@ -12,6 +12,7 @@ import java.util.regex.MatchResult;
 
 import com.tehbeard.utils.misc.CallbackMatcher;
 import com.tehbeard.utils.misc.CallbackMatcher.Callback;
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -39,13 +40,13 @@ public abstract class JDBCDataSource {
     protected final Logger logger;
     private final String connectionUrl;
     private final Properties connectionProperties;
-    protected final String type;
+    protected final String scriptSuffix;
 
     public JDBCDataSource(String connectionUrl, Properties connectionProperties, String type, String driverClass, Logger logger) throws ClassNotFoundException {
         try {
             Class.forName(driverClass);// load driver
             this.logger = logger;
-            this.type = type;
+            this.scriptSuffix = type;
         } catch (ClassNotFoundException e) {
             logger.log(Level.SEVERE, "JDBC {0} Library not found!", driverClass);
             throw e;
@@ -118,12 +119,13 @@ public abstract class JDBCDataSource {
         return classes;
     }
 
-    public void teardown() {
+    public void teardown() throws SQLException {
+        connection.close();
     }
 
     public String readSQL(String filename) {
         logger.log(Level.FINE, "Loading SQL: {0}", filename);
-        InputStream is = getClass().getResourceAsStream(filename + "." + type);
+        InputStream is = getClass().getResourceAsStream(filename + "." + scriptSuffix);
         if (is == null) {
             is = getClass().getResourceAsStream(filename + ".sql");
         }
@@ -187,10 +189,41 @@ public abstract class JDBCDataSource {
         return this.connection.prepareStatement(readSQL(scriptName));
     }
 
+    /**
+     * Generate a backup of the database.
+     * @param file
+     * @return
+     */
+    protected abstract boolean generateBackup(File file);
+    
+    /**
+     * restore the database from a backup.
+     * @param file
+     * @return
+     */
+    protected abstract boolean restoreBackup(File file);
+    
+    /**
+     * Return the migration script path.
+     * @param fromVersion
+     * @param toVersion
+     * @return 
+     */
     protected abstract String getMigrationScriptPath(int fromVersion, int toVersion);
 
     public void doMigration(int fromVersion, int toVersion) {
         //TODO - Add migration handler
+        
+        //Do backup
+        //Disable autocommit
+        //for(i = from -> to)
+        ////Run preupgrade methods
+        ////run script
+        ////run postupgrade method
+        ////commit
+        //Enable autocommit
+        
+        //If error, rollback, restore backup
     }
 
     private void runCodeFor(int version, Class<? extends Annotation> ann) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
