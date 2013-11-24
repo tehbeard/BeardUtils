@@ -34,12 +34,12 @@ public abstract class JDBCDataSource {
     // Database connection
     protected Connection connection;
     protected final Logger logger;
-    private final String connectionUrl;
-    private final Properties connectionProperties;
+    private String connectionUrl;
+    private Properties connectionProperties;
     protected final String scriptSuffix;
-    private final Properties sqlFragments;
+    private Properties sqlFragments;
 
-    public JDBCDataSource(String connectionUrl, Properties connectionProperties, Properties sqlFragments,String type, String driverClass, Logger logger) throws ClassNotFoundException {
+    public JDBCDataSource(String type, String driverClass, Logger logger) throws ClassNotFoundException {
         try {
             Class.forName(driverClass);// load driver
             this.logger = logger;
@@ -48,10 +48,21 @@ public abstract class JDBCDataSource {
             logger.log(Level.SEVERE, "JDBC {0} Library not found!", driverClass);
             throw e;
         }
-        this.connectionUrl = connectionUrl;
-        this.connectionProperties = connectionProperties;
+    }
+
+    public void setSqlFragments(Properties sqlFragments) {
         this.sqlFragments = sqlFragments;
     }
+
+    public void setConnectionUrl(String connectionUrl) {
+        this.connectionUrl = connectionUrl;
+    }
+
+    public void setConnectionProperties(Properties connectionProperties) {
+        this.connectionProperties = connectionProperties;
+    }
+    
+    
 
     public void setup() throws SQLException {
         connection = DriverManager.getConnection(this.connectionUrl, this.connectionProperties);
