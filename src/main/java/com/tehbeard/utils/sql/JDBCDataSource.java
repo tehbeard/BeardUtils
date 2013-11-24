@@ -83,6 +83,7 @@ public abstract class JDBCDataSource {
                     if (f.isAnnotationPresent(SQLScript.class)) {
                         try {
                             SQLScript script = f.getAnnotation(SQLScript.class);
+                            f.setAccessible(true);
                             f.set(this, getStatementFromScript(script.value(), script.flags()));
                         } catch (IllegalArgumentException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
@@ -92,6 +93,7 @@ public abstract class JDBCDataSource {
                     }else if (f.isAnnotationPresent(SQLFragment.class)) {
                         try {
                             SQLFragment script = f.getAnnotation(SQLFragment.class);
+                            f.setAccessible(true);
                             f.set(this, this.connection.prepareStatement(sqlFragments.getProperty(script.value() + "." + scriptSuffix), script.flags()));
                         } catch (IllegalArgumentException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
@@ -115,6 +117,7 @@ public abstract class JDBCDataSource {
             for (Field f : c.getDeclaredFields()) {
                 if (f.isAnnotationPresent(SQLInitScript.class)) {
                     try {
+                        f.setAccessible(true);
                         PreparedStatement s = (PreparedStatement) f.get(this);
                         s.execute();
                     } catch (IllegalArgumentException ex) {
@@ -143,9 +146,9 @@ public abstract class JDBCDataSource {
 
     public String readSQL(String filename) {
         logger.log(Level.FINE, "Loading SQL: {0}", filename);
-        InputStream is = getClass().getResourceAsStream(filename + "." + scriptSuffix);
+        InputStream is = getClass().getClassLoader().getResourceAsStream(filename + "." + scriptSuffix);
         if (is == null) {
-            is = getClass().getResourceAsStream(filename + ".sql");
+            is = getClass().getClassLoader().getResourceAsStream(filename + ".sql");
         }
         if (is == null) {
             throw new IllegalArgumentException("No SQL file found with name " + filename);
