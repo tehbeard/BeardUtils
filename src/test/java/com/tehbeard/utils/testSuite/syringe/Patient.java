@@ -1,6 +1,6 @@
 package com.tehbeard.utils.testSuite.syringe;
 
-import me.tehbeard.utils.syringe.Inject;
+import com.tehbeard.utils.syringe.Inject;
 
 public class Patient {
 

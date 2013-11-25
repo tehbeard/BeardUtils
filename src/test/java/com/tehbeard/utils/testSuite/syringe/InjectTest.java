@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Field;
 
-import me.tehbeard.utils.syringe.Inject;
-import me.tehbeard.utils.syringe.Injector;
+import com.tehbeard.utils.syringe.Inject;
+import com.tehbeard.utils.syringe.Injector;
 
 import org.junit.Test;
 
