@@ -2,7 +2,7 @@ package com.tehbeard.utils.syringe.configInjector;
 
 import java.lang.reflect.Field;
 
-import me.tehbeard.utils.syringe.Injector;
+import com.tehbeard.utils.syringe.Injector;
 
 import org.bukkit.configuration.ConfigurationSection;
 

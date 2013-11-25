@@ -1,4 +1,4 @@
-package me.tehbeard.utils.syringe;
+package com.tehbeard.utils.syringe;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package me.tehbeard.utils.syringe;
+package com.tehbeard.utils.syringe;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
