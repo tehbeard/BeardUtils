@@ -77,7 +77,7 @@ public abstract class JDBCDataSource {
      * @throws SQLException
      */
     private void prepareStatementCalls() throws SQLException {
-        for (Class c : getClasses()) {
+        for (Class<?> c : getClasses()) {
             for (Field f : c.getDeclaredFields()) {
                 if (PreparedStatement.class.isAssignableFrom(f.getType())) {
                     if (f.isAnnotationPresent(SQLScript.class)) {
@@ -113,7 +113,7 @@ public abstract class JDBCDataSource {
      * @throws SQLException
      */
     private void invokeCreateTable() throws SQLException {
-        for (Class c : getClasses()) {
+        for (Class<?> c : getClasses()) {
             for (Field f : c.getDeclaredFields()) {
                 if (f.isAnnotationPresent(SQLInitScript.class)) {
                     try {
@@ -130,9 +130,9 @@ public abstract class JDBCDataSource {
         }
     }
 
-    private List<Class> getClasses() {
-        List<Class> classes = new ArrayList<Class>();
-        Class c = this.getClass();
+    private List<Class<?>> getClasses() {
+        List<Class<?>> classes = new ArrayList<Class<?>>();
+        Class<?> c = this.getClass();
         while (c != Object.class) {
             classes.add(c);
             c = c.getSuperclass();
@@ -232,7 +232,7 @@ public abstract class JDBCDataSource {
      * @param toVersion
      * @return 
      */
-    protected abstract String getMigrationScriptPath(int fromVersion, int toVersion);
+    protected abstract String getMigrationScriptPath(int toVersion);
 
     public void doMigration(int fromVersion, int toVersion) throws SQLException {
         //TODO - Add migration handler
@@ -247,7 +247,7 @@ public abstract class JDBCDataSource {
         for(int migratingTo = fromVersion+1;migratingTo<=toVersion;migratingTo++){
             try {
                 runCodeFor(migratingTo, PreUpgrade.class);
-                executeScript(getMigrationScriptPath(fromVersion, toVersion));
+                executeScript(getMigrationScriptPath(migratingTo));
                 runCodeFor(migratingTo, PostUpgrade.class);
                 
                 connection.commit();
@@ -271,7 +271,7 @@ public abstract class JDBCDataSource {
     }
 
     private void runCodeFor(int version, Class<? extends Annotation> ann) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        for (Class c : getClasses()) {
+        for (Class<?> c : getClasses()) {
             for (Method m : c.getDeclaredMethods()) {
                 if (m.isAnnotationPresent(ann)) {
                     if (m.getAnnotation(DBVersion.class).value() == version) {
