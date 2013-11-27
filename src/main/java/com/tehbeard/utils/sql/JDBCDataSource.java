@@ -263,6 +263,7 @@ public abstract class JDBCDataSource {
                 connection.setAutoCommit(true);
             }
         }
+        connection.setAutoCommit(true);
         
         
         //Enable autocommit
