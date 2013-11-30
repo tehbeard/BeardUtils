@@ -235,7 +235,6 @@ public abstract class JDBCDataSource {
     protected abstract String getMigrationScriptPath(int toVersion);
 
     public void doMigration(int fromVersion, int toVersion) throws SQLException {
-        //TODO - Add migration handler
         //Do backup
         File backupFile = new File(getTempDir(),"backup.db");
         if(!generateBackup(backupFile)){

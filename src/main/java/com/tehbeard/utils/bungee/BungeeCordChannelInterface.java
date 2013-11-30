@@ -5,8 +5,6 @@
 package com.tehbeard.utils.bungee;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -23,7 +21,6 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 public class BungeeCordChannelInterface implements PluginMessageListener {
 
     private Plugin plugin;
-    private Map<String, PluginMessageListener> listeners = new HashMap<String, PluginMessageListener>();
     
     private Queue<MessageCallback<IPQuery>> ipQueuries = new LinkedBlockingQueue<MessageCallback<IPQuery>>();
     
