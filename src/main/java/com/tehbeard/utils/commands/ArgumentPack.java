@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.command.CommandSender;
-
 /**
  * Constructs an argument pack to allow building commands eaiser Takes an
  * argument string as input and provides simple methods to access boolean flags
@@ -19,18 +17,18 @@ import org.bukkit.command.CommandSender;
  * @author james
  * 
  */
-public class ArgumentPack {
+public class ArgumentPack<T> {
 
     private Set<String>         boolFlags;
     private Map<String, String> flagOptions;
     private List<String>        strArgs;
-    private CommandSender       sender;
+    private T       sender;
 
-    public CommandSender getSender() {
+    public T getSender() {
         return this.sender;
     }
 
-    public ArgumentPack(CommandSender sender, String[] boolFlags, String[] flagOpts, String[] rawArguments) {
+    public ArgumentPack(T sender, String[] boolFlags, String[] flagOpts, String[] rawArguments) {
         this(boolFlags, flagOpts, rawArguments);
         this.sender = sender;
     }

@@ -17,6 +17,7 @@ public class CommandArgumentParser {
     private static final Pattern parse_expression = Pattern.compile("\\@([arp])(\\[(.*)\\])?");
     private static final Pattern parse_arguments  = Pattern.compile("([a-zA-Z])\\=([0-9]*)");
 
+    @SuppressWarnings("deprecation")
     public static List<Player> parseArgument(String argument, Location baseLocation) {
         Location l = baseLocation.clone();
         Matcher matcher = parse_expression.matcher(argument);

@@ -220,7 +220,7 @@ public class CommandHandler implements Listener {
             this.senderType = senderType;
         }
 
-        public Boolean execute(ArgumentPack pack) {
+        public Boolean execute(ArgumentPack<CommandSender> pack) {
             try {
                 // enforce sender type validity
                 if (pack == null) {
@@ -244,7 +244,7 @@ public class CommandHandler implements Listener {
 
         @Override
         public boolean onCommand(CommandSender sender, Command cmd, String cmdlbl, String[] args) {
-            return execute(new ArgumentPack(sender, boolFlags, optFlags, args));
+            return execute(new ArgumentPack<CommandSender>(sender, boolFlags, optFlags, args));
         }
 
     }
