@@ -6,7 +6,7 @@ import com.tehbeard.utils.commands.CommandDescriptor;
 public class ACommand {
 
     @CommandDescriptor(label = "command")
-    public static boolean command(ArgumentPack pack) {
+    public static boolean command(ArgumentPack<Void> pack) {
         System.out.println("Called!");
         return false;
     }

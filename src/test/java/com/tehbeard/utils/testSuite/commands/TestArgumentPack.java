@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class TestArgumentPack {
 
-    ArgumentPack pack;
+    ArgumentPack<Void> pack;
 
     /**
      * create steveAB -type creeper -a -c "foo bar" [create, steveAB] [a] {c=foo
@@ -20,7 +20,7 @@ public class TestArgumentPack {
         String arg = "create 1.5 -type creeper vechs -a -c \"foo bar\"";
         String[] bool = { "a" };
         String[] opt = { "type", "c", "d" };
-        this.pack = new ArgumentPack(bool, opt, arg);
+        this.pack = new ArgumentPack<Void>(bool, opt, arg);
 
         for (int i = 0; i < this.pack.size(); i++) {
             System.out.println("" + i + " : " + this.pack.get(i));

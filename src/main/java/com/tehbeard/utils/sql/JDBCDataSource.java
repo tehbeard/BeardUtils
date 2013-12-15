@@ -50,15 +50,15 @@ public abstract class JDBCDataSource {
         }
     }
 
-    public void setSqlFragments(Properties sqlFragments) {
+    protected void setSqlFragments(Properties sqlFragments) {
         this.sqlFragments = sqlFragments;
     }
 
-    public void setConnectionUrl(String connectionUrl) {
+    protected void setConnectionUrl(String connectionUrl) {
         this.connectionUrl = connectionUrl;
     }
 
-    public void setConnectionProperties(Properties connectionProperties) {
+    protected void setConnectionProperties(Properties connectionProperties) {
         this.connectionProperties = connectionProperties;
     }
     
@@ -87,8 +87,10 @@ public abstract class JDBCDataSource {
                             f.set(this, getStatementFromScript(script.value(), script.flags()));
                         } catch (IllegalArgumentException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                            throw new SQLException("Failed to load script", ex);
                         } catch (IllegalAccessException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                            throw new SQLException("Access error on script field", ex);
                         }
                     }else if (f.isAnnotationPresent(SQLFragment.class)) {
                         try {
@@ -97,8 +99,10 @@ public abstract class JDBCDataSource {
                             f.set(this, this.connection.prepareStatement(sqlFragments.getProperty(script.value() + "." + scriptSuffix), script.flags()));
                         } catch (IllegalArgumentException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                            throw new SQLException("Failed to load fragment", ex);
                         } catch (IllegalAccessException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                            throw new SQLException("Access error on script fragment", ex);
                         }
                     }
                 }
