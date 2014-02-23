@@ -122,6 +122,7 @@ public class ItemSyntax {
      *            The line to parse it from.
      * @return The item to create.
      */
+    @SuppressWarnings("deprecation")
     public static ItemStack getItem(String line) {
 
         if ((line == null) || line.isEmpty()) {
