@@ -102,7 +102,7 @@ public abstract class JDBCDataSource {
                         try {
                             SQLFragment script = f.getAnnotation(SQLFragment.class);
                             f.setAccessible(true);
-                            f.set(this, this.connection.prepareStatement(sqlFragments.getProperty(script.value() + "." + scriptSuffix), script.flags()));
+                            f.set(this, this.connection.prepareStatement(processSQL(sqlFragments.getProperty(script.value() + "." + scriptSuffix)), script.flags()));
                         } catch (IllegalArgumentException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
                             throw new SQLException("Failed to load fragment", ex);
@@ -182,24 +182,31 @@ public abstract class JDBCDataSource {
     public void executeScript(String scriptName) throws SQLException {
         executeScript(scriptName, new HashMap<String, String>());
     }
+    
+    private static final CallbackMatcher matcher = new CallbackMatcher("\\$\\{([A-Za-z0-9_]*)\\}");
+    
+    public String processSQL(String sql){return processSQL(sql,new HashMap<String, String>());}
+    public String processSQL(String sql, final Map<String, String> keys){
+        return matcher.replaceMatches(sql, new Callback() {
+            @Override
+            public String foundMatch(MatchResult result) {
+                if (keys.containsKey(result.group(1))) {
+                    return keys.get(result.group(1));
+                }
+                if (sqlTags.containsKey(result.group(1))) {
+                    return sqlTags.getProperty(result.group(1));
+                }
+                return "";
+            }
+        });
+    }
 
     public void executeScript(String scriptName, final Map<String, String> keys) throws SQLException {
-        CallbackMatcher matcher = new CallbackMatcher("\\$\\{([A-Za-z0-9_]*)\\}");
+        
 
         String[] sqlStatements = readSQL(scriptName).split("\\;");
         for (String s : sqlStatements) {
-            String statement = matcher.replaceMatches(s, new Callback() {
-                @Override
-                public String foundMatch(MatchResult result) {
-                    if (keys.containsKey(result.group(1))) {
-                        return keys.get(result.group(1));
-                    }
-                    if (sqlTags.containsKey(result.group(1))) {
-                        return sqlTags.getProperty(result.group(1));
-                    }
-                    return "";
-                }
-            });
+            String statement = processSQL(s, keys);
 
             if (statement.startsWith("#!")) {
                 String subScript = statement.substring(2);
