@@ -38,6 +38,12 @@ public abstract class JDBCDataSource {
     private Properties connectionProperties;
     protected final String scriptSuffix;
     private Properties sqlFragments;
+    
+    private Properties sqlTags = new Properties();
+    
+    public void setTag(String key,String value){
+        sqlTags.setProperty(key, value);
+    }
 
     public JDBCDataSource(String type, String driverClass, Logger logger) throws ClassNotFoundException {
         try {
@@ -187,6 +193,9 @@ public abstract class JDBCDataSource {
                 public String foundMatch(MatchResult result) {
                     if (keys.containsKey(result.group(1))) {
                         return keys.get(result.group(1));
+                    }
+                    if (sqlTags.containsKey(result.group(1))) {
+                        return sqlTags.getProperty(result.group(1));
                     }
                     return "";
                 }
