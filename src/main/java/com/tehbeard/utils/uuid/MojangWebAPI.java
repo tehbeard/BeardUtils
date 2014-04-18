@@ -4,11 +4,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.UUID;
 
 import org.json.simple.JSONArray;
@@ -24,6 +23,7 @@ public class MojangWebAPI {
 
     public static final String UUID_NAME_LOOKUP_ENDPOINT = "https://api.mojang.com/profiles/minecraft";
     public static final String NAME_DATA_LOOKUP_ENDPOINT = "https://sessionserver.mojang.com/session/minecraft/profile/";
+    public static final String HAS_PAID_ENDPOINT         = "https://minecraft.net/haspaid.jsp?user=";
     
     public static final int MAX_QUERIES_PER_REQUEST = 100;
     /**
@@ -81,11 +81,26 @@ public class MojangWebAPI {
         return uuidMap; 
     }
     
+    public static boolean hasPaid(String name) throws Exception{
+        URL url = new URL(HAS_PAID_ENDPOINT + name);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setUseCaches(false);
+        connection.setDoInput(true);
+        connection.setDoOutput(false);
+        connection.connect();
+        connection.getResponseCode();
+        Scanner scan = new Scanner(connection.getInputStream());
+        String s = scan.next();
+        scan.close();
+        return Boolean.parseBoolean(s);
+    }
+    
     
     public static void main(String[] args) throws Exception{
-        Map<String, UUID> res = MojangWebAPI.lookupUUIDS(Arrays.asList(new String[]{"Tehbeard","Tulonsae","WokKA1","dsasdsakdhk"}));
-        for(Entry<String, UUID> entry : res.entrySet()){
-            System.out.println(entry.getKey() + " :: " + entry.getValue());
+        String[] names = new String[]{"Tulonsae","demonnaruto19","WokkA1"};
+        for(String name : names){
+          System.out.println(name + " :: "  + (MojangWebAPI.hasPaid(name) ? "paid" : "not paid"));
         }
     }
     
