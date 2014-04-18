@@ -87,8 +87,9 @@ public abstract class JDBCDataSource {
             for (Field f : c.getDeclaredFields()) {
                 if (PreparedStatement.class.isAssignableFrom(f.getType())) {
                     if (f.isAnnotationPresent(SQLScript.class)) {
+                        SQLScript script = null;
                         try {
-                            SQLScript script = f.getAnnotation(SQLScript.class);
+                            script = f.getAnnotation(SQLScript.class);
                             f.setAccessible(true);
                             f.set(this, getStatementFromScript(script.value(), script.flags()));
                         } catch (IllegalArgumentException ex) {
@@ -97,10 +98,13 @@ public abstract class JDBCDataSource {
                         } catch (IllegalAccessException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
                             throw new SQLException("Access error on script field", ex);
+                        } catch(Exception ex){
+                            throw new SQLException("Unknown error on script " + script.value(),ex);
                         }
                     }else if (f.isAnnotationPresent(SQLFragment.class)) {
+                        SQLFragment script = null;
                         try {
-                            SQLFragment script = f.getAnnotation(SQLFragment.class);
+                            script = f.getAnnotation(SQLFragment.class);
                             f.setAccessible(true);
                             f.set(this, this.connection.prepareStatement(processSQL(sqlFragments.getProperty(script.value() + "." + scriptSuffix)), script.flags()));
                         } catch (IllegalArgumentException ex) {
@@ -109,6 +113,8 @@ public abstract class JDBCDataSource {
                         } catch (IllegalAccessException ex) {
                             Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
                             throw new SQLException("Access error on script fragment", ex);
+                        } catch(Exception ex){
+                            throw new SQLException("Unknown error on script fragment " + script.value(),ex);
                         }
                     }
                 }
@@ -164,7 +170,7 @@ public abstract class JDBCDataSource {
             throw new IllegalArgumentException("No SQL file found with name " + filename);
         }
         Scanner scanner = new Scanner(is);
-        String sql = scanner.useDelimiter("\\Z").next().replaceAll("\\Z", "").replaceAll("\\n|\\r", "");
+        String sql = scanner.useDelimiter("\\Z").next().replaceAll("\\Z", "").replaceAll("\\n|\\r", " ");
         scanner.close();
         return sql;
 
@@ -216,6 +222,7 @@ public abstract class JDBCDataSource {
             } else if (statement.startsWith("#")) {
                 logger.log(Level.INFO, "Status : {0}", statement.substring(1));
             } else {
+                logger.log(Level.INFO,"Executing : " + statement);
                 this.connection.prepareStatement(statement).execute();
             }
         }
@@ -254,7 +261,7 @@ public abstract class JDBCDataSource {
      */
     protected abstract String getMigrationScriptPath(int toVersion);
 
-    public void doMigration(int fromVersion, int toVersion) throws SQLException {
+    public boolean doMigration(int fromVersion, int toVersion) throws SQLException {
         //Do backup
         File backupFile = new File(getTempDir(),"backup.db");
         if(!generateBackup(backupFile)){
@@ -277,6 +284,7 @@ public abstract class JDBCDataSource {
                 Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
                 connection.rollback();
                 restoreBackup(backupFile);
+                return false;
             }
             finally{
                 connection.setAutoCommit(true);
@@ -288,6 +296,7 @@ public abstract class JDBCDataSource {
         //Enable autocommit
         
         //If error, rollback, restore backup
+        return true;
     }
 
     private void runCodeFor(int version, Class<? extends Annotation> ann) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
