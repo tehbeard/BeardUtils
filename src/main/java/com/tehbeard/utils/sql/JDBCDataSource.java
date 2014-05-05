@@ -204,7 +204,7 @@ public abstract class JDBCDataSource {
                 }
                 return "";
             }
-        });
+        }).trim();
     }
 
     public void executeScript(String scriptName, final Map<String, String> keys) throws SQLException {
@@ -213,16 +213,13 @@ public abstract class JDBCDataSource {
         String[] sqlStatements = readSQL(scriptName).split("\\;");
         for (String s : sqlStatements) {
             String statement = processSQL(s, keys);
-
             if (statement.startsWith("#!")) {
                 String subScript = statement.substring(2);
-                logger.log(Level.INFO, "Executing : {0}", subScript);
                 executeScript(subScript, keys);
                 continue;
             } else if (statement.startsWith("#")) {
                 logger.log(Level.INFO, "Status : {0}", statement.substring(1));
             } else {
-                logger.log(Level.INFO,"Executing : " + statement);
                 this.connection.prepareStatement(statement).execute();
             }
         }
@@ -310,4 +307,5 @@ public abstract class JDBCDataSource {
             }
         }
     }
+    
 }
