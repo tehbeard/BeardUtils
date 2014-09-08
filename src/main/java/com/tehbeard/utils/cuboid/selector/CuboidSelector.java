@@ -1,62 +1,54 @@
 package com.tehbeard.utils.cuboid.selector;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import com.tehbeard.utils.Vec3;
 import com.tehbeard.utils.cuboid.Cuboid;
 import com.tehbeard.utils.cuboid.selector.CuboidSelector.StatusIndicator.Activity;
 import com.tehbeard.utils.session.SessionStore;
-
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Standard class for selecting a region of a world (cuboid) Relies on
  * SessionStore and Cuboid packages
- * 
+ *
  * @author James
- * 
+ *
  */
-public class CuboidSelector implements Listener {
+public class CuboidSelector {
 
-    private SessionStore<Cuboid> session = new SessionStore<Cuboid>();
-    private Material             tool;
-    StatusIndicator              indicator;
+    private final SessionStore<Cuboid> session = new SessionStore<Cuboid>();
+    StatusIndicator indicator;
 
-    private Set<String>          active  = new HashSet<String>();
+    private final Set<String> active = new HashSet<String>();
 
-    public CuboidSelector(Material tool, StatusIndicator indicator) {
+    public CuboidSelector(StatusIndicator indicator) {
         this.indicator = indicator;
-        this.tool = tool;
     }
 
-    private void indicate(Activity activity, Player player, Cuboid cuboid) {
+    private void indicate(Activity activity, String player, Cuboid cuboid) {
         if (this.indicator != null) {
             this.indicator.cuboidUpdate(activity, player, cuboid);
         }
     }
 
-    public void setActive(Player player) {
-        this.active.add(player.getName());
+    public void setActive(String player) {
+        this.active.add(player);
 
-        this.session.putSession(player.getName(), new Cuboid());
+        this.session.putSession(player, new Cuboid());
         indicate(Activity.ACTIVE, player, null);
     }
 
-    public void setInActive(Player player) {
-        this.active.remove(player.getName());
-        this.session.clearSession(player.getName());
+    public void setInActive(String player) {
+        this.active.remove(player);
+        this.session.clearSession(player);
         indicate(Activity.INACTIVE, player, null);
     }
 
-    public boolean isActive(Player player) {
-        return this.active.contains(player.getName());
+    public boolean isActive(String player) {
+        return this.active.contains(player);
     }
 
-    public boolean toggle(Player player) {
+    public boolean toggle(String player) {
         if (isActive(player)) {
             setInActive(player);
         } else {
@@ -66,39 +58,36 @@ public class CuboidSelector implements Listener {
         return isActive(player);
     }
 
-    @SuppressWarnings("incomplete-switch")
-    @EventHandler
-    public void click(PlayerInteractEvent event) {
-        String player = event.getPlayer().getName();
-        if (!isActive(event.getPlayer())) {
-            return;
+    public boolean leftClick(String player, Vec3 vec) {
+        if (!isActive(player)) {
+            return false;
         }
-        if (event.getPlayer().getItemInHand().getType() != this.tool) {
-            return;
-        }
-        event.setCancelled(true);
+        this.session.getSession(player).setV1(vec);
+        indicate(Activity.SELECT_CORNER_ONE, player, this.session.getSession(player));
+        return true;
+    }
 
-        switch (event.getAction()) {
-        case LEFT_CLICK_BLOCK:
-            this.session.getSession(player).setV1(event.getClickedBlock().getLocation().toVector());
-            indicate(Activity.SELECT_CORNER_ONE, event.getPlayer(), this.session.getSession(player));
-            break;
-        case RIGHT_CLICK_BLOCK:
-            this.session.getSession(player).setV2(event.getClickedBlock().getLocation().toVector());
-            indicate(Activity.SELECT_CORNER_TWO, event.getPlayer(), this.session.getSession(player));
-            break;
+    public boolean rightClick(String player, Vec3 vec) {
+        if (!isActive(player)) {
+            return false;
         }
+        this.session.getSession(player).setV1(vec);
+        indicate(Activity.SELECT_CORNER_TWO, player, this.session.getSession(player));
+        return true;
     }
 
     public Cuboid getCuboid(String player) {
         return this.session.getSession(player);
+
     }
 
     public interface StatusIndicator {
+
         public enum Activity {
+
             SELECT_CORNER_ONE, SELECT_CORNER_TWO, ACTIVE, INACTIVE
         }
 
-        public void cuboidUpdate(Activity activity, Player player, Cuboid cuboid);
+        public void cuboidUpdate(Activity activity, String player, Cuboid cuboid);
     }
 }

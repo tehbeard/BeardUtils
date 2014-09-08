@@ -3,21 +3,18 @@ package com.tehbeard.utils.session;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * Generic class for storing sessions You can activate killing a session on
- * logout by registering the instance of this class with bukkits event system
+ * logout by registering the instance of this class with event bus
  * 
  * @author James
  * 
  * @param <T>
  */
-public class SessionStore<T> implements Listener {
+public class SessionStore<T> {
 
-    private Map<String, T> sessions;
+    private final Map<String, T> sessions;
 
     public SessionStore() {
         this.sessions = new HashMap<String, T>();
@@ -57,10 +54,10 @@ public class SessionStore<T> implements Listener {
         this.sessions.remove(player);
     }
 
-    @EventHandler
-    public void logout(PlayerQuitEvent e) {
-        clearSession(e.getPlayer().getName());
-    }
+// TODO : Add Logout handler for easy session clearing 
+//    public void logout(Object e) {
+//        clearSession(e.getPlayer().getName());
+//    }
     
     public Map<String, T> getMap(){
         return sessions;

@@ -1,13 +1,12 @@
 package com.tehbeard.utils.cuboid;
 
+import com.tehbeard.utils.Vec3;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 /**
  * handles checking a cuboid cache against a player's location
@@ -49,34 +48,23 @@ public class ChunkCache<T> {
         // ADD ITEM TO CACHE
     }
 
-    /**
-     * Return a list of entries that the player is inside
-     * 
-     * @param player
-     *            player to check against
-     * @return a list of entries
-     */
-    public List<CuboidEntry<T>> getEntries(Player player) {
-        return getEntries(player.getLocation());
-    }
 
     /**
-     * Return a list of entries at that location
-     * 
-     * @param location
-     *            location to check
-     * @return a list of entries
+     * Get entries
+     * @param loc Vec3 of location
+     * @param dim Dimension string target
+     * @return 
      */
-    public List<CuboidEntry<T>> getEntries(Location location) {
-        String world = location.getWorld().getName();
-        String cx = "" + (location.getBlockX() / 16);
-        String cz = "" + (location.getBlockZ() / 16);
+    public List<CuboidEntry<T>> getEntries(Vec3 loc,String dim) {
+        String world = dim;
+        String cx = "" + (loc.bx / 16);
+        String cz = "" + (loc.bz / 16);
         List<CuboidEntry<T>> ret = new ArrayList<CuboidEntry<T>>();
 
         if (this.cache.containsKey("" + world + "," + cx + "," + cz)) {
             // BeardAch.printDebugCon("Chunk cache found records, checking....");
             for (CuboidEntry<T> entry : this.cache.get("" + world + "," + cx + "," + cz)) {
-                if (entry.getCuboid().isInside(location)) {
+                if (entry.getCuboid().isInside(loc)) {
                     ret.add(entry);
                 }
             }
