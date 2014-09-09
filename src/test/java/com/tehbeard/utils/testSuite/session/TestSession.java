@@ -7,8 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import com.tehbeard.utils.session.SessionStore;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -44,9 +42,7 @@ public class TestSession {
 
         assertEquals("session stored", session.getSession("alice"), (Integer) 5);
 
-        Player player = mock(Player.class);
-        when(player.getName()).thenReturn("alice");
-        session.logout(new PlayerQuitEvent(player, "HAXX"));
+        session.clearSession("alice");
         assertFalse("entry for alice cleared", session.hasSession("alice"));
     }
 }

@@ -1,8 +1,6 @@
 package com.tehbeard.utils.json.item;
 
 
-import org.bukkit.inventory.ItemStack;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -28,13 +26,5 @@ public class JsonItem {
     
     public JsonItem(){}
     
-    @SuppressWarnings("deprecation")
-    public JsonItem(int slot,ItemStack item){
-        this.slot = slot;
-        
-        this.id = item.getTypeId();
-        this.damage = item.getDurability();
-        this.count = item.getAmount();
-        this.tag = new JsonNbtTag(item.getItemMeta());
-    }
+    
 }

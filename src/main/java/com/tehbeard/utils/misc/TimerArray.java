@@ -83,7 +83,6 @@ public class TimerArray<T> {
      * Find objects that have elapsed, only usable with
      * {@link TimerArray#addFuture(T, long)}
      * 
-     * @param millisecondsPast
      * @return
      */
     public List<T> timeElapsed() {

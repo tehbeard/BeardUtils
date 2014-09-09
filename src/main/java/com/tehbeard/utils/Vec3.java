@@ -13,8 +13,8 @@ public class Vec3 {
         this.y = y;
         this.z = z;
         this.bx = new Double(x).intValue();
-        this.by = new Double(x).intValue();
-        this.bz = new Double(x).intValue();
+        this.by = new Double(y).intValue();
+        this.bz = new Double(z).intValue();
     }
     
     public Vec3 add(Vec3 vec){

@@ -1,5 +1,9 @@
 package com.tehbeard.utils.uuid;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import com.google.gson.stream.JsonReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -12,16 +16,22 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
 /**
  * API to access Mojang's various web endpoints to get information
  * @author James
  *
  */
 public class MojangWebAPI {
+    
+    public class ProfileEntry{
+        public String error;
+        public String id;
+        public String name;
+        
+        public UUID getUUID(){
+            return UUID.fromString(id.substring(0, 8) + "-" + id.substring(8, 12) + "-" + id.substring(12, 16) + "-" + id.substring(16, 20) + "-" +id.substring(20, 32));
+        }
+    }
 
     public static final String UUID_NAME_LOOKUP_ENDPOINT = "https://api.mojang.com/profiles/minecraft";
     public static final String NAME_DATA_LOOKUP_ENDPOINT = "https://sessionserver.mojang.com/session/minecraft/profile/";
@@ -65,22 +75,17 @@ public class MojangWebAPI {
         
         OutputStream body = connection.getOutputStream();
         
-        JSONArray array = new JSONArray();
-        
+        List<String> array = new ArrayList<String>();
         array.addAll(names);
         
-        body.write(array.toJSONString().getBytes());
+        body.write(new Gson().toJson(array).getBytes());
         body.flush();
         body.close();
         
-        JSONParser jsonParser =  new JSONParser();
-        JSONArray profiles = (JSONArray) jsonParser.parse(new InputStreamReader(connection.getInputStream()));
-        for(Object o : profiles){
-            JSONObject jsonProfile = (JSONObject) o;
-            String id = (String) jsonProfile.get("id");
-            String name = (String) jsonProfile.get("name");
-            UUID uuid = UUID.fromString(id.substring(0, 8) + "-" + id.substring(8, 12) + "-" + id.substring(12, 16) + "-" + id.substring(16, 20) + "-" +id.substring(20, 32));
-            uuidMap.put(name, uuid);
+        //new InputStreamReader(connection.getInputStream())
+        List<ProfileEntry> profiles = new Gson().fromJson(new JsonReader(new InputStreamReader(connection.getInputStream())), new TypeToken<List<ProfileEntry>>(){}.getType());
+        for(ProfileEntry o : profiles){
+            uuidMap.put(o.name, o.getUUID());
         }
         return uuidMap; 
     }
@@ -123,12 +128,11 @@ public class MojangWebAPI {
         connection.connect();
         connection.getResponseCode();
         
-        JSONObject profile = (JSONObject) new JSONParser().parse(new InputStreamReader(connection.getInputStream()));
-        if(profile.containsKey("error")){
+        ProfileEntry profile = new Gson().fromJson(new JsonReader(new InputStreamReader(connection.getInputStream())), ProfileEntry.class);
+        if(profile.error.length() > 0){
         	return null;
         }
-        String id = (String) profile.get("id");
-        return UUID.fromString(id.substring(0, 8) + "-" + id.substring(8, 12) + "-" + id.substring(12, 16) + "-" + id.substring(16, 20) + "-" +id.substring(20, 32));
+        return profile.getUUID();
     }
     
     /**
@@ -150,15 +154,7 @@ public class MojangWebAPI {
         connection.connect();
         connection.getResponseCode();
         
-        Object res = new JSONParser().parse(new InputStreamReader(connection.getInputStream()));
-        if(res instanceof JSONArray == false){
-        	return null;
-        }
-        Iterator<String> it = ((JSONArray)res).iterator();
-        while(it.hasNext()){
-        	aliases.add((String)it.next());
-        }
-    	return aliases;
+        return new Gson().fromJson(new JsonReader(new InputStreamReader(connection.getInputStream())), new TypeToken<List<String>>(){}.getType());
     }
     
     /**
