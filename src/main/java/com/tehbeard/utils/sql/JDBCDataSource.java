@@ -17,7 +17,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Array;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -39,7 +42,9 @@ public abstract class JDBCDataSource {
     protected final String scriptSuffix;
     private Properties sqlFragments;
     
-    private Properties sqlTags = new Properties();
+    private final Properties sqlTags = new Properties();
+    
+    private final JDBCKeyValStore kvStore = new JDBCKeyValStore();
     
     public void setTag(String key,String value){
         sqlTags.setProperty(key, value);
@@ -73,6 +78,7 @@ public abstract class JDBCDataSource {
     public void setup() throws SQLException {
         connection = DriverManager.getConnection(this.connectionUrl, this.connectionProperties);
         prepareStatementCalls();
+        kvStore.setup(this);
         invokeCreateTable();
     }
 
@@ -305,6 +311,160 @@ public abstract class JDBCDataSource {
                     }
                 }
             }
+        }
+    }
+    
+    public JDBCKeyValStore getKeyValStore(){
+        return this.kvStore;
+    }
+    
+    private static final class JDBCKeyValStore {
+        
+        @SQLRawSet(value=@SQLRaw(sql="CREATE TABLE IF NOT EXISTS ${PREFIX}_keyval(`key` varchar(255) NOT NULL,`value` varchar(255) NULL,`added` timestamp NOT NULL)",type="sql"))
+        private PreparedStatement create;
+        
+        @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM ${PREFIX}_keyval WHERE `key`=? order by `added` DESC LIMIT 1",type="sql"))
+        private PreparedStatement get;
+        
+        @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM (SELECT * FROM ${PREFIX}_keyval WHERE `key` IN (?) ORDER BY `added` DESC) _k GROUP BY `key` HAVING `value` IS NOT NULL",type="sql"))
+        private PreparedStatement getAll;
+        
+        @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM (SELECT * FROM ${PREFIX}_keyval WHERE `key` NOT IN (?) ORDER BY `added` DESC) _k GROUP BY `key` HAVING `value` IS NOT NULL",type="sql"))
+        private PreparedStatement getAllExcept;
+        
+        @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM ${PREFIX}_keyval WHERE `key`=? order by `added` DESC",type="sql"))
+        private PreparedStatement getIterations;
+        
+        @SQLRawSet(value=@SQLRaw(sql="INSERT INTO ${PREFIX}_keyval VALUES(?,?,?)",type="sql"))
+        private PreparedStatement add;
+        
+        @SQLRawSet(value=@SQLRaw(sql="DELETE FROM kv USING ${PREFIX}_keyval kv INNER JOIN (SELECT `key`,`added` FROM (SELECT * FROM ${PREFIX}_keyval WHERE `key` NOT IN (?) ORDER BY `added` DESC) _k GROUP BY `key`) _k ON ( ( kv.`key` = _k.`key` AND kv.`added` < _k.`added` ) OR ( kv.`key` = _k.`key` AND _k.`value` IS NULL ) )",type="sql"))
+        private PreparedStatement compact;
+        
+        private Connection con;
+
+        private void setup(JDBCDataSource source) throws SQLException{
+            con = source.connection;
+            for (Field f : this.getClass().getDeclaredFields()) {
+                if (PreparedStatement.class.isAssignableFrom(f.getType())) {
+                    if (f.isAnnotationPresent(SQLRawSet.class)) {
+                        SQLRawSet set = f.getAnnotation(SQLRawSet.class);
+                        try {
+                            String script = null;
+                            int flags = 0;
+                            for(SQLRaw raw : set.value()){
+                                if(raw.type().equals(source.scriptSuffix)){
+                                    script = raw.sql();
+                                    flags = raw.flags();
+                                }
+                            }
+                            if(script == null){
+                                throw new SQLException("No @SQLRaw found for " + f.getName() + " for type " + source.scriptSuffix);
+                            }
+                            f.setAccessible(true);
+                            f.set(this, source.connection.prepareStatement(source.processSQL(script), flags));
+                        } catch (IllegalArgumentException ex) {
+                            Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                            throw new SQLException("Failed to load raw", ex);
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                            throw new SQLException("Access error on script raw", ex);
+                        } catch(Exception ex){
+                            throw new SQLException("Unknown error on script raw " + f.getName(),ex);
+                        }
+                    }
+                }
+            }
+            create.execute();
+        }
+        
+        /**
+         * Sets the value of a key
+         * @param key
+         * @param value
+         * @throws SQLException 
+         */
+        public void set(String key, String value) throws SQLException{
+            add.setString(1, key);
+            add.setString(2, value);
+            add.setTimestamp(3,new Timestamp(System.currentTimeMillis()));
+            add.execute();
+        }
+        
+        /**
+         * Return current value of key
+         * @param key
+         * @return
+         * @throws SQLException 
+         */
+        public String get(String key) throws SQLException{
+            get.setString(1,key);
+            ResultSet rs = get.executeQuery();
+            if(rs.next()){
+                String q = rs.getString(1);
+                rs.close();
+                return q;
+            }
+            return null;
+        }
+        
+        /**
+         * Get all keys provided
+         * @param key
+         * @return
+         * @throws SQLException 
+         */
+        public Map<String,String> getAll(String... key) throws SQLException{
+            getAll.setArray(1, con.createArrayOf("varchar", key));
+            ResultSet rs = getAll.executeQuery();
+            Map<String,String> res = new HashMap<String, String>();
+            while(rs.next()){
+                res.put(rs.getString(1), rs.getString(2));
+            }
+            rs.close();
+            return res;
+        }
+        
+        /**
+         * Get all keys except those provided.
+         * @param key
+         * @return
+         * @throws SQLException 
+         */
+        public Map<String,String> getAllExcept(String... key) throws SQLException{
+            getAllExcept.setArray(1, con.createArrayOf("varchar", key));
+            ResultSet rs = getAllExcept.executeQuery();
+            Map<String,String> res = new HashMap<String, String>();
+            while(rs.next()){
+                res.put(rs.getString(1), rs.getString(2));
+            }
+            rs.close();
+            return res;
+        }
+        
+        /**
+         * Get all iterations of a key
+         * @param key
+         * @return
+         * @throws SQLException 
+         */
+        public Map<String,Map<Long,String>> getIterations(String key) throws SQLException{
+            getIterations.setString(1,  key);
+            ResultSet rs = getIterations.executeQuery();
+            Map<String,Map<Long,String>> res = new HashMap<String,Map<Long,String>>();
+            while(rs.next()){
+                if(!res.containsKey(rs.getString(1))){
+                    res.put(rs.getString(1), new HashMap<Long, String>());
+                }
+                res.get(rs.getString(1)).put(rs.getTimestamp(3).getTime(), rs.getString(2));
+            }
+            rs.close();
+            return res;
+        }
+        
+        public void compact(String... ignore) throws SQLException{
+            compact.setArray(1, con.createArrayOf("varchar", ignore));
+            compact.execute();
         }
     }
     
