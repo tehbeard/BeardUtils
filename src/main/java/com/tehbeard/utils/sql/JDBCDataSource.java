@@ -121,6 +121,31 @@ public abstract class JDBCDataSource {
                         } catch(Exception ex){
                             throw new SQLException("Unknown error on script fragment " + script.value(),ex);
                         }
+                    }else if (f.isAnnotationPresent(SQLRawSet.class)) {
+                        SQLRawSet set = f.getAnnotation(SQLRawSet.class);
+                        try {
+                            String script = null;
+                            int flags = 0;
+                            for(SQLRaw raw : set.value()){
+                                if(raw.type().equals(this.scriptSuffix)){
+                                    script = raw.sql();
+                                    flags = raw.flags();
+                                }
+                            }
+                            if(script == null){
+                                throw new SQLException("No @SQLRaw found for " + f.getName() + " for type " + this.scriptSuffix);
+                            }
+                            f.setAccessible(true);
+                            f.set(this, this.connection.prepareStatement(this.processSQL(script), flags));
+                        } catch (IllegalArgumentException ex) {
+                            Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                            throw new SQLException("Failed to load raw", ex);
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                            throw new SQLException("Access error on script raw", ex);
+                        } catch(Exception ex){
+                            throw new SQLException("Unknown error on script raw " + f.getName(),ex);
+                        }
                     }
                 }
             }
@@ -244,16 +269,15 @@ public abstract class JDBCDataSource {
      * @param file
      * @return
      */
-    protected abstract boolean generateBackup(File file);
+    protected abstract boolean generateBackup(String name);
     
     /**
      * restore the database from a backup.
      * @param file
      * @return
      */
-    protected abstract boolean restoreBackup(File file);
+    protected abstract boolean restoreBackup(String name);
     
-    protected abstract File getTempDir();
     
     /**
      * Return the migration script path.
@@ -263,10 +287,11 @@ public abstract class JDBCDataSource {
      */
     protected abstract String getMigrationScriptPath(int toVersion);
 
-    public boolean doMigration(int fromVersion, int toVersion) throws SQLException {
+    public boolean doMigration(int toVersion) throws SQLException {
+        int fromVersion = Integer.parseInt(getKeyValStore().get("schema_version").value);
+        String backupName = "migration." + Math.floor(System.currentTimeMillis()/1000L) + "@v" + fromVersion;
         //Do backup
-        File backupFile = new File(getTempDir(),"backup.db");
-        if(!generateBackup(backupFile)){
+        if(!generateBackup(backupName)){
             logger.severe("Failed to generate backup file, aborting migration");
             throw new SQLException("Backup generation failed.");
         }
@@ -278,6 +303,7 @@ public abstract class JDBCDataSource {
                 executeScript(getMigrationScriptPath(migratingTo));
                 runCodeFor(migratingTo, PostUpgrade.class);
                 
+                getKeyValStore().set("schema_version", "" + migratingTo,false);
                 connection.commit();
             }
             //Enable autocommit
@@ -285,7 +311,7 @@ public abstract class JDBCDataSource {
             catch (Exception ex) {
                 Logger.getLogger(JDBCDataSource.class.getName()).log(Level.SEVERE, null, ex);
                 connection.rollback();
-                restoreBackup(backupFile);
+                restoreBackup(backupName);
                 return false;
             }
             finally{
@@ -317,12 +343,30 @@ public abstract class JDBCDataSource {
         return this.kvStore;
     }
     
-    private static final class JDBCKeyValStore {
+    public static final class JDBCKeyValStore {
         
-        @SQLRawSet(value=@SQLRaw(sql="CREATE TABLE IF NOT EXISTS ${PREFIX}_keyval(`key` varchar(255) NOT NULL,`value` varchar(255) NULL,`added` timestamp NOT NULL)",type="sql"))
+        public class KeyValEntry{
+            public final String key;
+            public final String value;
+            public final long added;
+
+            public KeyValEntry(String key, String value, long added) {
+                this.key = key;
+                this.value = value;
+                this.added = added;
+            }
+
+            @Override
+            public String toString() {
+                return "KeyValEntry{" + "key=" + key + ", value=" + value + ", added=" + added + '}';
+            }
+
+        }
+        
+        @SQLRawSet(value=@SQLRaw(sql="CREATE TABLE IF NOT EXISTS ${PREFIX}_keyval(`id` INT AUTO_INCREMENT,`noCompact` BOOLEAN NOT NULL DEFAULT FALSE, `key` VARCHAR( 255 ) NOT NULL , `value` VARCHAR( 255 ) NULL , `added` TIMESTAMP NOT NULL ,PRIMARY KEY (  `id` ))",type="sql"))
         private PreparedStatement create;
         
-        @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM ${PREFIX}_keyval WHERE `key`=? order by `added` DESC LIMIT 1",type="sql"))
+        @SQLRawSet(value=@SQLRaw(sql="SELECT `key`,`value`,`added` FROM ${PREFIX}_keyval WHERE `key`=? order by `added` DESC LIMIT 1",type="sql"))
         private PreparedStatement get;
         
         @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM (SELECT * FROM ${PREFIX}_keyval WHERE `key` IN (?) ORDER BY `added` DESC) _k GROUP BY `key` HAVING `value` IS NOT NULL",type="sql"))
@@ -334,15 +378,20 @@ public abstract class JDBCDataSource {
         @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM ${PREFIX}_keyval WHERE `key`=? order by `added` DESC",type="sql"))
         private PreparedStatement getIterations;
         
-        @SQLRawSet(value=@SQLRaw(sql="INSERT INTO ${PREFIX}_keyval VALUES(?,?,?)",type="sql"))
+        @SQLRawSet(value=@SQLRaw(sql="INSERT INTO ${PREFIX}_keyval (`key`,`value`,`added`,`noCompact`) VALUES(?,?,?,?)",type="sql"))
         private PreparedStatement add;
         
-        @SQLRawSet(value=@SQLRaw(sql="DELETE FROM kv USING ${PREFIX}_keyval kv INNER JOIN (SELECT `key`,`added` FROM (SELECT * FROM ${PREFIX}_keyval WHERE `key` NOT IN (?) ORDER BY `added` DESC) _k GROUP BY `key`) _k ON ( ( kv.`key` = _k.`key` AND kv.`added` < _k.`added` ) OR ( kv.`key` = _k.`key` AND _k.`value` IS NULL ) )",type="sql"))
+        @SQLRawSet(value=@SQLRaw(sql="DELETE FROM kv USING ${PREFIX}_keyval kv INNER JOIN (SELECT * FROM (SELECT * FROM ${PREFIX}_keyval WHERE `noCompact`=0 ORDER BY `id` DESC) as kv GROUP BY `key`) as _k ON ( ( kv.`key` = _k.`key` AND kv.`id` < _k.`id` ) OR ( kv.`key` = _k.`key` AND _k.`value` IS NULL ) )",type="sql"))
+        private PreparedStatement compactAll;
+        
+        @SQLRawSet(value=@SQLRaw(sql="DELETE FROM kv USING ${PREFIX}_keyval kv INNER JOIN (SELECT * FROM ${PREFIX}_keyval WHERE `key`=? order by `id` DESC LIMIT 1) as _k ON ( ( kv.`key` = _k.`key` AND kv.`id` < _k.`id` ) OR ( kv.`key` = _k.`key` AND _k.`value` IS NULL ) )",type="sql"))
         private PreparedStatement compact;
         
         private Connection con;
+        private JDBCDataSource source;
 
         private void setup(JDBCDataSource source) throws SQLException{
+            this.source = source;
             con = source.connection;
             for (Field f : this.getClass().getDeclaredFields()) {
                 if (PreparedStatement.class.isAssignableFrom(f.getType())) {
@@ -383,12 +432,15 @@ public abstract class JDBCDataSource {
          * @param value
          * @throws SQLException 
          */
-        public void set(String key, String value) throws SQLException{
+        public void set(String key, String value,boolean noCompact) throws SQLException{
             add.setString(1, key);
             add.setString(2, value);
             add.setTimestamp(3,new Timestamp(System.currentTimeMillis()));
+            add.setBoolean(4, noCompact);
             add.execute();
         }
+        
+        
         
         /**
          * Return current value of key
@@ -396,13 +448,13 @@ public abstract class JDBCDataSource {
          * @return
          * @throws SQLException 
          */
-        public String get(String key) throws SQLException{
+        public KeyValEntry get(String key) throws SQLException{
             get.setString(1,key);
             ResultSet rs = get.executeQuery();
             if(rs.next()){
-                String q = rs.getString(1);
+                KeyValEntry k = new KeyValEntry(rs.getString(1), rs.getString(2), rs.getTimestamp(3).getTime());
                 rs.close();
-                return q;
+                return k;
             }
             return null;
         }
@@ -461,9 +513,15 @@ public abstract class JDBCDataSource {
             return res;
         }
         
-        public void compact(String... ignore) throws SQLException{
-            compact.setArray(1, con.createArrayOf("varchar", ignore));
+        public void compactAll() throws SQLException{
+            compactAll.execute();
+
+        }
+        
+        public void compact(String key) throws SQLException{
+            compact.setString(1, key);
             compact.execute();
+            //compactAll.execute();
         }
     }
     
