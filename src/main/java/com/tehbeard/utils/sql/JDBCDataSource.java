@@ -369,13 +369,13 @@ public abstract class JDBCDataSource {
         @SQLRawSet(value=@SQLRaw(sql="SELECT `key`,`value`,`added` FROM ${PREFIX}_keyval WHERE `key`=? order by `added` DESC LIMIT 1",type="sql"))
         private PreparedStatement get;
         
-        @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM (SELECT * FROM ${PREFIX}_keyval WHERE `key` IN (?) ORDER BY `added` DESC) _k GROUP BY `key` HAVING `value` IS NOT NULL",type="sql"))
+        @SQLRawSet(value=@SQLRaw(sql="SELECT `key`,`value`,`added` FROM (SELECT * FROM ${PREFIX}_keyval WHERE `key` IN (?) ORDER BY `added` DESC) _k GROUP BY `key` HAVING `value` IS NOT NULL",type="sql"))
         private PreparedStatement getAll;
         
-        @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM (SELECT * FROM ${PREFIX}_keyval WHERE `key` NOT IN (?) ORDER BY `added` DESC) _k GROUP BY `key` HAVING `value` IS NOT NULL",type="sql"))
+        @SQLRawSet(value=@SQLRaw(sql="SELECT `key`,`value`,`added` FROM (SELECT * FROM ${PREFIX}_keyval WHERE `key` NOT IN (?) ORDER BY `added` DESC) _k GROUP BY `key` HAVING `value` IS NOT NULL",type="sql"))
         private PreparedStatement getAllExcept;
         
-        @SQLRawSet(value=@SQLRaw(sql="SELECT * FROM ${PREFIX}_keyval WHERE `key`=? order by `added` DESC",type="sql"))
+        @SQLRawSet(value=@SQLRaw(sql="SELECT `key`,`value`,`added` FROM ${PREFIX}_keyval WHERE `key`=? order by `added` DESC",type="sql"))
         private PreparedStatement getIterations;
         
         @SQLRawSet(value=@SQLRaw(sql="INSERT INTO ${PREFIX}_keyval (`key`,`value`,`added`,`noCompact`) VALUES(?,?,?,?)",type="sql"))
@@ -459,35 +459,17 @@ public abstract class JDBCDataSource {
             return null;
         }
         
-        /**
-         * Get all keys provided
-         * @param key
+         /**
+         * Get all keys
          * @return
          * @throws SQLException 
          */
-        public Map<String,String> getAll(String... key) throws SQLException{
-            getAll.setArray(1, con.createArrayOf("varchar", key));
+        public Map<String,KeyValEntry> getAll() throws SQLException{
+            getAll.setString(1,"");
             ResultSet rs = getAll.executeQuery();
-            Map<String,String> res = new HashMap<String, String>();
+            Map<String,KeyValEntry> res = new HashMap<String, KeyValEntry>();
             while(rs.next()){
-                res.put(rs.getString(1), rs.getString(2));
-            }
-            rs.close();
-            return res;
-        }
-        
-        /**
-         * Get all keys except those provided.
-         * @param key
-         * @return
-         * @throws SQLException 
-         */
-        public Map<String,String> getAllExcept(String... key) throws SQLException{
-            getAllExcept.setArray(1, con.createArrayOf("varchar", key));
-            ResultSet rs = getAllExcept.executeQuery();
-            Map<String,String> res = new HashMap<String, String>();
-            while(rs.next()){
-                res.put(rs.getString(1), rs.getString(2));
+                res.put(rs.getString(1), new KeyValEntry(rs.getString(1), rs.getString(2),rs.getTimestamp(3).getTime()));
             }
             rs.close();
             return res;
@@ -499,15 +481,12 @@ public abstract class JDBCDataSource {
          * @return
          * @throws SQLException 
          */
-        public Map<String,Map<Long,String>> getIterations(String key) throws SQLException{
+        public List<KeyValEntry> getIterations(String key) throws SQLException{
             getIterations.setString(1,  key);
             ResultSet rs = getIterations.executeQuery();
-            Map<String,Map<Long,String>> res = new HashMap<String,Map<Long,String>>();
+            List<KeyValEntry> res = new ArrayList<KeyValEntry>();
             while(rs.next()){
-                if(!res.containsKey(rs.getString(1))){
-                    res.put(rs.getString(1), new HashMap<Long, String>());
-                }
-                res.get(rs.getString(1)).put(rs.getTimestamp(3).getTime(), rs.getString(2));
+                res.add(new KeyValEntry(rs.getString(1), rs.getString(2),rs.getTimestamp(3).getTime()));
             }
             rs.close();
             return res;
