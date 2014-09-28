@@ -12,7 +12,6 @@ import java.util.regex.MatchResult;
 
 import com.tehbeard.utils.misc.CallbackMatcher;
 import com.tehbeard.utils.misc.CallbackMatcher.Callback;
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -45,10 +44,22 @@ public abstract class JDBCDataSource {
     
     private final JDBCKeyValStore kvStore = new JDBCKeyValStore();
     
+    /**
+     * Set a SQL script tag
+     * @param key ${key} to replace
+     * @param value value to set it to
+     */
     public void setTag(String key,String value){
         sqlTags.setProperty(key, value);
     }
 
+    /**
+     * Instantiate class and load driver
+     * @param type
+     * @param driverClass
+     * @param logger
+     * @throws ClassNotFoundException 
+     */
     public JDBCDataSource(String type, String driverClass, Logger logger) throws ClassNotFoundException {
         try {
             Class.forName(driverClass);// load driver
@@ -60,20 +71,32 @@ public abstract class JDBCDataSource {
         }
     }
 
+    /**
+     * Map of name=>sql code to use (useful for small queries that don't need their own file).
+     * @param sqlFragments 
+     */
     protected void setSqlFragments(Properties sqlFragments) {
         this.sqlFragments = sqlFragments;
     }
-
+    /**
+     * Set JDBC connection URL
+     * @param connectionUrl 
+     */
     protected void setConnectionUrl(String connectionUrl) {
         this.connectionUrl = connectionUrl;
     }
-
+    /**
+     * Set key=>value map for JDBC connection
+     * @param connectionProperties 
+     */
     protected void setConnectionProperties(Properties connectionProperties) {
         this.connectionProperties = connectionProperties;
     }
     
-    
-
+    /**
+     * Connect to database, initialise statements, boot key-val store, run create table script
+     * @throws SQLException 
+     */
     public void setup() throws SQLException {
         connection = DriverManager.getConnection(this.connectionUrl, this.connectionProperties);
         prepareStatementCalls();
@@ -82,7 +105,7 @@ public abstract class JDBCDataSource {
     }
 
     /**
-     * Automagically prepares the fields that are Statement and have
+     * Automagically prepares the fields that are Statement and have a @SQL... compatible annotation
      *
      * @SQLScript annotations
      * @throws SQLException
@@ -153,7 +176,7 @@ public abstract class JDBCDataSource {
     }
 
     /**
-     * Invokes the field with
+     * Invokes the field with @SQLInitScript
      *
      * @SQLInitScript annotation to create tables etc.
      * @throws SQLException
@@ -176,6 +199,10 @@ public abstract class JDBCDataSource {
         }
     }
 
+    /**
+     * Helper method to get all classes for parsing.
+     * @return 
+     */
     private List<Class<?>> getClasses() {
         List<Class<?>> classes = new ArrayList<Class<?>>();
         Class<?> c = this.getClass();
@@ -185,11 +212,20 @@ public abstract class JDBCDataSource {
         }
         return classes;
     }
-
+    
+    /**
+     * Close JDBC connection
+     * @throws SQLException 
+     */
     public void teardown() throws SQLException {
         connection.close();
     }
-
+    
+    /**
+     * Read SQL from a resource in the JAR.
+     * @param filename
+     * @return 
+     */
     public String readSQL(String filename) {
         logger.log(Level.FINE, "Loading SQL: {0}", filename);
         InputStream is = getClass().getClassLoader().getResourceAsStream(filename + "." + scriptSuffix);
@@ -280,15 +316,21 @@ public abstract class JDBCDataSource {
     
     
     /**
-     * Return the migration script path.
+     * Return the migration script path for use with readSQL()
      * @param fromVersion
      * @param toVersion
      * @return 
      */
     protected abstract String getMigrationScriptPath(int toVersion);
 
+    /**
+     * Migrates database to the target version.
+     * @param toVersion
+     * @return
+     * @throws SQLException 
+     */
     public boolean doMigration(int toVersion) throws SQLException {
-        int fromVersion = Integer.parseInt(getKeyValStore().get("schema_version").value);
+        int fromVersion = getSchemaVersion();
         String backupName = "migration." + Math.floor(System.currentTimeMillis()/1000L) + "@v" + fromVersion;
         //Do backup
         if(!generateBackup(backupName)){
@@ -303,7 +345,7 @@ public abstract class JDBCDataSource {
                 executeScript(getMigrationScriptPath(migratingTo));
                 runCodeFor(migratingTo, PostUpgrade.class);
                 
-                getKeyValStore().set("schema_version", "" + migratingTo,false);
+                getKeyValStore().set(KEY_SCHEMA_VERSION, "" + migratingTo,false);
                 connection.commit();
             }
             //Enable autocommit
@@ -327,6 +369,14 @@ public abstract class JDBCDataSource {
         return true;
     }
 
+    /**
+     * Used for doMigration() to call java code during migration either before or after a migration script.
+     * @param version
+     * @param ann
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
     private void runCodeFor(int version, Class<? extends Annotation> ann) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         for (Class<?> c : getClasses()) {
             for (Method m : c.getDeclaredMethods()) {
@@ -339,9 +389,34 @@ public abstract class JDBCDataSource {
         }
     }
     
+    /**
+     * Get the key-val store for this database.
+     * @return 
+     */
     public JDBCKeyValStore getKeyValStore(){
         return this.kvStore;
     }
+    
+    /**
+     * Return the schema version this database is designed for.
+     * @return 
+     */
+    public abstract int getDataSourceVersion();
+    
+    /**
+     * Return the schema version of the database.
+     * @return
+     * @throws SQLException 
+     */
+    public int getSchemaVersion() throws SQLException {
+        JDBCKeyValStore.KeyValEntry key = getKeyValStore().get(KEY_SCHEMA_VERSION);
+        if(key == null){
+            getKeyValStore().set(KEY_SCHEMA_VERSION, ""+getDataSourceVersion(), true);
+            key = getKeyValStore().get(KEY_SCHEMA_VERSION);
+        }
+        return Integer.parseInt(key.value);
+    }
+    private static final String KEY_SCHEMA_VERSION = "schema_version";
     
     public static final class JDBCKeyValStore {
         
@@ -430,6 +505,7 @@ public abstract class JDBCDataSource {
          * Sets the value of a key
          * @param key
          * @param value
+         * @param noCompact
          * @throws SQLException 
          */
         public void set(String key, String value,boolean noCompact) throws SQLException{
@@ -492,11 +568,20 @@ public abstract class JDBCDataSource {
             return res;
         }
         
+        /**
+         * Remove all old key-val entries, leaving only the latest (does not apply to those marked noCompact)
+         * @throws SQLException 
+         */
         public void compactAll() throws SQLException{
             compactAll.execute();
 
         }
         
+        /**
+         * Compacts a specific key, ignores noCompact
+         * @param key
+         * @throws SQLException 
+         */
         public void compact(String key) throws SQLException{
             compact.setString(1, key);
             compact.execute();
