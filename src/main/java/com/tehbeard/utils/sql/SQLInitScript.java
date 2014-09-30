@@ -14,6 +14,7 @@ import java.lang.annotation.Target;
  * @author James
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 public @interface SQLInitScript {
+    String value();
 }
