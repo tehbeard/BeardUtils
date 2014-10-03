@@ -24,8 +24,8 @@ public class FileUtils {
         destChannel = new FileOutputStream(dest).getChannel();
         destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
        }finally{
-           sourceChannel.close();
-           destChannel.close();
+        if(sourceChannel!=null){sourceChannel.close();}
+        if(destChannel!=null){destChannel.close();}
        }
 }
 }
