@@ -1,4 +1,4 @@
-package com.tehbeard.utils.misc;
+package com.tehbeard.utils;
 
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;

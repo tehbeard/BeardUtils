@@ -177,17 +177,11 @@ public class MojangWebAPI {
     	return getProfileAliases(lookupUuidByNameAt(name,-1));
     }
     
-    public static void main(String[] args) throws Exception{
-        String[] names = new String[]{"Tulonsae","demonnaruto19","WokkA1"};
-        for(String name : names){
-          System.out.println(name + " :: "  + (MojangWebAPI.hasPaid(name) ? "paid" : "not paid"));
-        }
-        
-        List<String> alias = MojangWebAPI.getKnownAliases("tehbeard");
-        System.out.println("Aliases of Tehbeard:");
-        for(String a : alias){
-        	System.out.println(a);
-        }
+    public static UUID expandUUID(String uuid){
+        return UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" +uuid.substring(20, 32));
     }
     
+    public static String compactUUID(UUID uuid){
+        return uuid.toString().replaceAll("-", "");
+    }
 }

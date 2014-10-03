@@ -10,8 +10,8 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.regex.MatchResult;
 
-import com.tehbeard.utils.misc.CallbackMatcher;
-import com.tehbeard.utils.misc.CallbackMatcher.Callback;
+import com.tehbeard.utils.CallbackMatcher;
+import com.tehbeard.utils.CallbackMatcher.Callback;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
