@@ -561,6 +561,14 @@ public abstract class JDBCDataSource {
             }
             return null;
         }
+        
+        public boolean hasKey(String key) throws SQLException{
+            get.setString(1, key);
+            ResultSet rs = get.executeQuery();
+            boolean res = rs.next();
+            rs.close();
+            return res;
+        }
 
         /**
          * Get all keys
