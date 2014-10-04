@@ -442,7 +442,7 @@ public abstract class JDBCDataSource {
         }
         return Integer.parseInt(key.value);
     }
-    private static final String KEY_SCHEMA_VERSION = "schema_version";
+    public static final String KEY_SCHEMA_VERSION = "schema_version";
 
     public static final class JDBCKeyValStore {
 
