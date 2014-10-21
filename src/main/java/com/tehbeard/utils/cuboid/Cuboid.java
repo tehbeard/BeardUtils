@@ -37,17 +37,17 @@ public class Cuboid {
     }
 
     public void setCuboid(Vec3 c1, Vec3 c2, String world) {
-        this.v1 = c1;
-        this.v2 = c2;
+        this.v1 = c1.clone().floor();
+        this.v2 = c2.clone().floor();
         this.world = world;
     }
 
     public void setV1(Vec3 c1) {
-        this.v1 = c1;
+        this.v1 = c1.clone().floor();
     }
 
     public void setV2(Vec3 c2) {
-        this.v2 = c2;
+        this.v2 = c2.clone().floor();
     }
 
     /**
@@ -64,10 +64,10 @@ public class Cuboid {
     public ArrayList<String> getChunks() {
         ArrayList<String> chunks = new ArrayList<String>();
         if ((this.v1 != null) && (this.v2 != null)) {
-            int cx1 = this.v1.bx / 16;
-            int cz1 = this.v1.bz / 16;
-            int cx2 = this.v2.bx / 16;
-            int cz2 = this.v2.bz / 16;
+            int cx1 = (int)(this.v1.x / 16);
+            int cz1 = (int)(this.v1.z / 16);
+            int cx2 = (int)(this.v2.x / 16);
+            int cz2 = (int)(this.v2.z / 16);
             int cx, cz;
 
             for (cx = cx1; cx <= cx2; cx++) {
@@ -89,8 +89,8 @@ public class Cuboid {
 
     @Override
     public String toString() {
-        return this.world + ":" + this.v1.bx + ":" + this.v1.by + ":" + this.v1.bz + ":"
-                + this.v2.bx + ":" + this.v2.by + ":" + this.v2.bz;
+        return this.world + ":" + this.v1.x + ":" + this.v1.y + ":" + this.v1.z + ":"
+                + this.v2.x + ":" + this.v2.y + ":" + this.v2.z;
     }
 
     public int size() {

@@ -57,12 +57,11 @@ public class ChunkCache<T> {
      */
     public List<CuboidEntry<T>> getEntries(Vec3 loc,String dim) {
         String world = dim;
-        String cx = "" + (loc.bx / 16);
-        String cz = "" + (loc.bz / 16);
+        String cx = "" + (int)(Math.floor(loc.x) / 16);
+        String cz = "" + (int)(Math.floor(loc.z) / 16);
         List<CuboidEntry<T>> ret = new ArrayList<CuboidEntry<T>>();
 
         if (this.cache.containsKey("" + world + "," + cx + "," + cz)) {
-            // BeardAch.printDebugCon("Chunk cache found records, checking....");
             for (CuboidEntry<T> entry : this.cache.get("" + world + "," + cx + "," + cz)) {
                 if (entry.getCuboid().isInside(loc)) {
                     ret.add(entry);

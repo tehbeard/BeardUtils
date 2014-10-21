@@ -5,40 +5,57 @@ package com.tehbeard.utils;
  * @author James
  */
 public class Vec3 {
-    public final double x,y,z;
-    public final int bx,by,bz;
+    public double x,y,z;
     
     public Vec3(double x, double y, double z){
         this.x = x;
         this.y = y;
         this.z = z;
-        this.bx = new Double(x).intValue();
-        this.by = new Double(y).intValue();
-        this.bz = new Double(z).intValue();
     }
     
     public Vec3 add(Vec3 vec){
-        return new Vec3(x+vec.x,y+vec.y,z+vec.z);
+        x+=vec.x;y+=vec.y;z+=vec.z;
+        return this;
     }
     
     public Vec3 sub(Vec3 vec){
-        return new Vec3(x-vec.x,y-vec.y,z-vec.z);
+        x-=vec.x;y-=vec.y;z-=vec.z;
+        return this;
     }
     
     public Vec3 div(Vec3 vec){
-        return new Vec3(x/vec.x,y/vec.y,z/vec.z);
+        x/=vec.x;y/=vec.y;z/=vec.z;
+        return this;
     }
     
     public Vec3 mul(Vec3 vec){
-        return new Vec3(x*vec.x,y*vec.y,z*vec.z);
+        x*=vec.x;y*=vec.y;z*=vec.z;
+        return this;
     }
     
     public Vec3 abs(){
-        return new Vec3(Math.abs(x), Math.abs(y), Math.abs(z));
+        x = Math.abs(x);y=Math.abs(y);z=Math.abs(z);
+        return this;
+    }
+    
+    public Vec3 floor(){
+        x = Math.floor(x);y=Math.floor(y);z=Math.floor(z);
+        return this;
     }
     
     public int areaB(){
-        return bx * by * bz;
+
+        return (int) (Math.floor(x) * Math.floor(y) * Math.floor(z));
+    }
+
+    @Override
+    public String toString() {
+        return "Vec3{" + "x=" + x + ", y=" + y + ", z=" + z + '}';
+    }
+    
+    @Override
+    public Vec3 clone(){
+        return new Vec3(x, y, z);
     }
     
     public boolean isInAABB(Vec3 a, Vec3 b){
