@@ -1,5 +1,6 @@
 package com.tehbeard.utils.syringe.injectors.properties;
 
+import com.tehbeard.utils.syringe.InjectConfig;
 import com.tehbeard.utils.syringe.Injector;
 import java.lang.reflect.Field;
 import java.util.Properties;

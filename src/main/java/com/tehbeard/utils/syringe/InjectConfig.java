@@ -1,4 +1,4 @@
-package com.tehbeard.utils.syringe.injectors.properties;
+package com.tehbeard.utils.syringe;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
