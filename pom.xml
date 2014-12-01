@@ -50,12 +50,6 @@
         </dependency>
         
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.7.9-R0.1-SNAPSHOT</version>
-        </dependency>
-        
-        <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
             <version>1.0</version>
