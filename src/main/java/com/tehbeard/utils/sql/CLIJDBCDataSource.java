@@ -87,12 +87,18 @@ public abstract class CLIJDBCDataSource extends JDBCDataSource {
             database.teardown();
         } catch (SQLException ex) {
             line("WARNING: Database teardown did not execute successfully, data corruption possible.");
+            ex.printStackTrace();
         }
         }
 
         @Command(aliases = "migrate", desc = "Migrates the database")
         public void commandMigrate() {
-
+            try{
+            database.doMigration(database.getDataSourceVersion());
+            } catch (SQLException ex) {
+            line("WARNING: Database migration failed, data corruption possible.");
+            ex.printStackTrace();
+        }
         }
 
         @Command(aliases = "help", desc = "Displays help information")
@@ -109,6 +115,19 @@ public abstract class CLIJDBCDataSource extends JDBCDataSource {
                     line(cmd.getPrimaryAlias() + " - " + cmd.getDescription().getShortDescription());
                 }
             }
+        }
+        
+        @Command(aliases = "version", desc="Show schema version")
+        public void commandVersion(){
+            line("Data source: " + database.getDataSourceVersion());
+            try{
+            line("Schema: " + database.getSchemaVersion());
+            }
+            catch (SQLException ex) {
+                line("Could not fetch Schema version.");
+                ex.printStackTrace();
+            }
+
         }
     }
 }
