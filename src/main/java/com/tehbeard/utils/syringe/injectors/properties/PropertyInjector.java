@@ -6,13 +6,12 @@ import java.lang.reflect.Field;
 import com.tehbeard.utils.syringe.Injector;
 import java.util.Properties;
 
-
 /**
- * Injects data into fields of an object from a ConfigurationSection, using @InjectConfig
- * annotations
- * 
+ * Injects data into fields of an object from a ConfigurationSection, using
+ * @InjectConfig annotations
+ *
  * @author James
- * 
+ *
  */
 public class PropertyInjector extends Injector<Object, InjectConfig> {
 
@@ -28,8 +27,10 @@ public class PropertyInjector extends Injector<Object, InjectConfig> {
     protected void doInject(InjectConfig annotation, Object object, Field field) throws IllegalArgumentException,
             IllegalAccessException {
         Object value = this.section.get(annotation.value());
-        if(value != null){
-        field.set(object, value);
+        if (field.getType() == String.class) {
+            field.set(object.toString(), value);
+        } else {
+            field.set(object, value);
         }
 
     }
