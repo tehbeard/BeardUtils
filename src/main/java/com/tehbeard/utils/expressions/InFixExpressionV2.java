@@ -124,7 +124,7 @@ public class InFixExpressionV2 {
     }
 
     private boolean isOperator(char c) {
-        return ((c == '+') || (c == '-') || (c == '*') || (c == '/') || (c == '^'));
+        return "+-*/^".indexOf(c) != -1;
     }
 
     private boolean isVariable(String s) {
