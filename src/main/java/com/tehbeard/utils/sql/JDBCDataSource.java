@@ -205,7 +205,7 @@ public abstract class JDBCDataSource {
         for (Class<?> f : getClasses()) {
 
             if (f.isAnnotationPresent(SQLInitScript.class)) {
-                System.out.println("Executing create");
+                
                 executeScript(f.getAnnotation(SQLInitScript.class).value());
             }
         }
