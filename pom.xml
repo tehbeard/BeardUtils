@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tehbeard</groupId>
     <artifactId>utils</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>BeardUtils</name>
     <description>
@@ -16,9 +16,15 @@
         </repository>
         
         <repository>
-            <id>sponge</id>
-            <name>Spongey Goodness</name>
-            <url>http://repo.spongepowered.org/Sponge/maven/</url>
+            <id>sponge-maven-repo</id>
+            <name>Sponge maven repo</name>
+            <url>http://repo.spongepowered.org/maven</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
         
     </repositories>
@@ -49,11 +55,12 @@
             <version>2.2.2</version>
         </dependency>
         
-<!--        <dependency>
+        <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
-            <version>1.0</version>
-        </dependency>-->
+            <version>2.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
         
         <dependency>
             <groupId>com.sk89q</groupId>
