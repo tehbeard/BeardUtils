@@ -5,14 +5,10 @@
  */
 package com.tehbeard.utils.sponge;
 
-import com.google.common.reflect.TypeToken;
 import com.tehbeard.utils.syringe.InjectConfig;
 import com.tehbeard.utils.syringe.Injector;
 import java.lang.reflect.Field;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 /**
  *
@@ -29,11 +25,7 @@ public class HOCONInjector extends Injector<Object, InjectConfig> {
 
     @Override
     protected void doInject(InjectConfig annotation, Object object, Field field) throws IllegalArgumentException, IllegalAccessException {
-        try {
-            field.set(object, node.getNode(annotation.value()).getValue(TypeToken.of(field.getClass())));
-        } catch (ObjectMappingException ex) {
-            Logger.getLogger(HOCONInjector.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        field.set(object, node.getNode((Object[])annotation.value().split("\\.")).getValue());
     }
     
 }
