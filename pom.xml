@@ -79,23 +79,42 @@
   
   
     <distributionManagement>
-        <repository>
+        <!--        <repository>
             <id>dev-repo</id>
             <name>dev.escapecraft.com Releases</name>
             <url>scp://dev.escapecraft.com/var/www/maven</url>
-        </repository>
-        <snapshotRepository>
+        </repository>-->
+        <!--        <snapshotRepository>
             <id>dev-repo-snap</id>
             <name>dev.escapecraft.com Snapshots</name>
             <url>scp://dev.escapecraft.com/var/www/maven</url>
-        </snapshotRepository>
-        <site>
+        </snapshotRepository>-->
+        <!--        <site>
             <id>site</id>
             <name>http://dev.escapecraft.com/maven/me/tehbeard/utils/</name>
             <url>scp://dev.escapecraft.com/maven/me/tehbeard/utils/</url>
-        </site>
+        </site>-->
+        
+        <repository>
+            <id>tehbeard-repo</id>
+            <name>maven.tehbeard.com</name>
+            <url>${env.CI_DEPLOY_SERVER}</url>
+        </repository>
     </distributionManagement>
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>2.1</version>
+            </extension>
+            
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.1</version>
+            </extension>
+        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
