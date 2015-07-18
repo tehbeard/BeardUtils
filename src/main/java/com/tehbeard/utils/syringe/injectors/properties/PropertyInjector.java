@@ -28,7 +28,7 @@ public class PropertyInjector extends Injector<Object, InjectConfig> {
             IllegalAccessException {
         Object value = this.section.get(annotation.value());
         if (field.getType() == String.class) {
-            field.set(object.toString(), value);
+            field.set(object, value.toString());
         } else {
             field.set(object, value);
         }
