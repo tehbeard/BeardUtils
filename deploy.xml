@@ -3,7 +3,12 @@
 		<server>
 			<id>tehbeard-repo</id>
 			<username>${env.CI_DEPLOY_USERNAME}</username>
-     		<password>${env.CI_DEPLOY_PASSWORD}</password>
+			<password>${env.CI_DEPLOY_PASSWORD}</password>
+			<configuration>
+				<knownHostsProvider implementation="org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider">
+					<hostKeyChecking>no</hostKeyChecking>
+				</knownHostsProvider>
+			</configuration>
 		</server>
 	</servers>
 </settings>

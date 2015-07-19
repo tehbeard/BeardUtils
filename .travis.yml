@@ -5,3 +5,5 @@ env:
   - secure: SzodmDmxTMe9RnhH1J1QneAYuJkMsjskMVmIxz90rt3c0JLigkl2HynKxhKAcfD/Z2yvqtlxOSE+bNcvw3mYEvARwnRNvErkJTx/AVk1UDU/1HY5OFkJ2HbG4rWOX/jHAoLHOZ+F/II/f4hOy82CsfgLXB8Az0G+ZyznnGvxqbU=
   - secure: F0jMISTyTEzK5FoUmax3LZ/3Hm+l4ZACQlWAn3Kf8ldLnnzMHBmeaYIJy5laqkjjPNO5Ws3rfap2y28iUs9vSO9/aZN1QfZ6u8zZifnK3hPLm/hhAJZWzm9lLbxSh3q/YaZ2Begq6q8QrJI6lAUmO0smTdVRdIYdW3ZaOZqrigg=
 script: "mvn deploy --settings deploy.xml"
+addons:
+  ssh_known_hosts: tehbeard.com
