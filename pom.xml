@@ -1,115 +1,30 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.tehbeard</groupId>
-    <artifactId>utils</artifactId>
-    <version>3.1.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <artifactId>utils.parent</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>BeardUtils</name>
-    <description>
-  
-    </description>
-    <repositories>
-        <!-- Repository for Bukkit -->
-        <repository>
-            <id>maven.sk89q.com</id>
-            <url>http://maven.sk89q.com/repo/</url>
-        </repository>
-        
-        <repository>
-            <id>sponge-maven-repo</id>
-            <name>Sponge maven repo</name>
-            <url>http://repo.spongepowered.org/maven</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        
-    </repositories>
+
+    <modules>
+        <module>sponge</module>
+        <module>spigot</module>
+        <module>common</module>
+    </modules>
+    
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>1.4.9</version>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>1.4.9</version>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.2</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.spongepowered</groupId>
-            <artifactId>spongeapi</artifactId>
-            <version>2.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.sk89q</groupId>
-            <artifactId>intake</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
-        </dependency>
-  
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.33</version>
-            <scope>runtime</scope>
-        </dependency>
-  
+        <!-- <dependency>
+        	<groupId>com.tehbeard</groupId>
+                <artifactId>utils.common</artifactId>
+                <version>4.0.0-SNAPSHOT</version>
+        </dependency> -->
     </dependencies>
-  
-  
-    <distributionManagement>
-        <!--        <repository>
-            <id>dev-repo</id>
-            <name>dev.escapecraft.com Releases</name>
-            <url>scp://dev.escapecraft.com/var/www/maven</url>
-        </repository>-->
-        <!--        <snapshotRepository>
-            <id>dev-repo-snap</id>
-            <name>dev.escapecraft.com Snapshots</name>
-            <url>scp://dev.escapecraft.com/var/www/maven</url>
-        </snapshotRepository>-->
-        <!--        <site>
-            <id>site</id>
-            <name>http://dev.escapecraft.com/maven/me/tehbeard/utils/</name>
-            <url>scp://dev.escapecraft.com/maven/me/tehbeard/utils/</url>
-        </site>-->
-        
-        <repository>
-            <id>tehbeard-repo</id>
-            <name>maven.tehbeard.com</name>
-            <url>${env.CI_DEPLOY_SERVER}</url>
-        </repository>
-    </distributionManagement>
+
     <build>
-        <extensions>
-            <!-- Enabling the use of FTP -->
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ftp</artifactId>
-                <version>2.5</version>
-            </extension>
-        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -123,37 +38,25 @@
                     <target>6</target>
                 </configuration>
             </plugin>
-            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.sk89q:intake</include>
-                                </includes>
-                            </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.sk89q.intake</pattern>
-                                    <shadedPattern>com.tehbeard.utils.intake</shadedPattern>
-                                </relocation>
-                            </relocations>
-                            <minimizeJar>false</minimizeJar>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
+        <extensions>
+            <!-- Enabling the use of FTP -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>2.5</version>
+            </extension>
+        </extensions>
     </build>
- 
+
+    <distributionManagement>
+        <repository>
+            <id>tehbeard-repo</id>
+            <name>maven.tehbeard.com</name>
+            <url>${env.CI_DEPLOY_SERVER}</url>
+        </repository>
+    </distributionManagement>
+
     <reporting>
         <plugins>
             <plugin>
@@ -164,6 +67,5 @@
                 </configuration>
             </plugin>
         </plugins>
-
     </reporting>
 </project>
