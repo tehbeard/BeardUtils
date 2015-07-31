@@ -51,6 +51,7 @@
         	<groupId>com.tehbeard</groupId>
                 <artifactId>utils.common</artifactId>
                 <version>4.0.0-SNAPSHOT</version>
+                <classifier>shaded</classifier>
         </dependency>
     </dependencies>
     <build>
