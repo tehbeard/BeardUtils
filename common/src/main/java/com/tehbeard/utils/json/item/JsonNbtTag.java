@@ -1,8 +1,6 @@
 package com.tehbeard.utils.json.item;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -46,7 +44,7 @@ public class JsonNbtTag {
 
     //Display sub category
     @Expose
-    public JsonNbtDisplay display;
+    public JsonNbtDisplay display = new JsonNbtDisplay();
 
     public class JsonNbtDisplay {
 
@@ -65,16 +63,5 @@ public class JsonNbtTag {
     @Expose
     @SerializedName("SkullOwner")
     public String skullOwner;
-
-    //TODO - Fireworks
-    public JsonNbtTag() {
-        initDisplay();
-    }
-
-    public void initDisplay() {
-        if (display == null) {
-            display = new JsonNbtDisplay();
-        }
-    }
-
+    
 }
