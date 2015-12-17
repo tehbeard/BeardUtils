@@ -27,8 +27,8 @@ public class HOCONInjector extends Injector<Object, InjectConfig> {
     protected void doInject(InjectConfig annotation, Object object, Field field) throws IllegalArgumentException, IllegalAccessException {
         Object[] path = (Object[])annotation.value().split("\\.");
         CommentedConfigurationNode value = node.getNode(path);
-        //field.set(object,);
-        throw new UnsupportedOperationException("Shit's fucked up with HOCON, (java8 issue?)");
+        //field.set(object, ???);
+        throw new UnsupportedOperationException("Shit's fucked up with HOCON, (java8 issue?) Supplier not found.");
     }
     
 }
