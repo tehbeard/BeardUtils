@@ -25,7 +25,10 @@ public class HOCONInjector extends Injector<Object, InjectConfig> {
 
     @Override
     protected void doInject(InjectConfig annotation, Object object, Field field) throws IllegalArgumentException, IllegalAccessException {
-        field.set(object, node.getNode((Object[])annotation.value().split("\\.")).getValue());
+        Object[] path = (Object[])annotation.value().split("\\.");
+        CommentedConfigurationNode value = node.getNode(path);
+        //field.set(object,);
+        throw new UnsupportedOperationException("Shit's fucked up with HOCON, (java8 issue?)");
     }
     
 }
