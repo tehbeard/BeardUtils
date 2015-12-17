@@ -484,12 +484,13 @@ public abstract class JDBCDataSource {
 
         @SQLRawSet(@SQLRaw(sql = "DELETE FROM ${PREFIX}_keyval WHERE `key` = ? AND (`id` NOT IN (SELECT `id` FROM (SELECT * FROM ${PREFIX}_keyval ORDER BY `id` DESC) _k GROUP BY `key` HAVING `value` IS NOT NULL) OR `value` IS NULL)", type = "sql"))
         private PreparedStatement compact;
+        
+        @SQLRawSet(@SQLRaw(sql = "SELECT Table_Name, concat(CAST(CEIL((Data_length+Index_length)/1024) as char),'kb') as size FROM INFORMATION_SCHEMA.tables WHERE table_schema=?", type = "sql"))
+        private PreparedStatement getTableInfo;
 
         private Connection con;
-        private JDBCDataSource source;
 
         private void setup(JDBCDataSource source) throws SQLException {
-            this.source = source;
             con = source.connection;
             con.prepareStatement(source.processSQL("CREATE TABLE IF NOT EXISTS ${PREFIX}_keyval(`id` INT AUTO_INCREMENT,`noCompact` BOOLEAN NOT NULL DEFAULT FALSE, `key` VARCHAR( 255 ) NOT NULL , `value` VARCHAR( 255 ) NULL , `added` TIMESTAMP NOT NULL ,PRIMARY KEY (  `id` ))")).execute();
             for (Field f : this.getClass().getDeclaredFields()) {
@@ -524,6 +525,16 @@ public abstract class JDBCDataSource {
             }
         }
 
+        public Map<String, String> getTableInfo() throws SQLException{
+            this.getTableInfo.setString(1, this.con.getSchema());
+            ResultSet rs = this.getTableInfo.executeQuery();
+            Map<String,String> data = new HashMap<String,String>();
+            while(rs.next()){
+                data.put(rs.getString(1), rs.getString(2));
+            }
+            rs.close();
+            return data;
+        }
         public void set(String key, String value) throws SQLException{
             set(key,value,false);
         }
