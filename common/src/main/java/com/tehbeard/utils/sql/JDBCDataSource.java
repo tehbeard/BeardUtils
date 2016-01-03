@@ -356,6 +356,9 @@ public abstract class JDBCDataSource {
      */
     public boolean doMigration(int toVersion) throws SQLException {
         int fromVersion = getSchemaVersion();
+        if(toVersion == fromVersion){
+            return true;
+        }
         String backupName = "migration." + Math.floor(System.currentTimeMillis() / 1000L) + "@v" + fromVersion;
         //Do backup
         if (!generateBackup(backupName)) {
