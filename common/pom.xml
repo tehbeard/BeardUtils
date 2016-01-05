@@ -8,7 +8,7 @@
     <description>Common classes for BeardUtils.</description>
     <parent>
         <groupId>com.tehbeard</groupId>
-        <artifactId>utils.parent</artifactId>
+        <artifactId>utils</artifactId>
         <version>4.0.1-SNAPSHOT</version>
     </parent>
     <repositories>
