@@ -488,7 +488,12 @@ public abstract class JDBCDataSource {
         @SQLRawSet(@SQLRaw(sql = "DELETE FROM ${PREFIX}_keyval WHERE `key` = ? AND (`id` NOT IN (SELECT `id` FROM (SELECT * FROM ${PREFIX}_keyval ORDER BY `id` DESC) _k GROUP BY `key` HAVING `value` IS NOT NULL) OR `value` IS NULL)", type = "sql"))
         private PreparedStatement compact;
         
-        @SQLRawSet(@SQLRaw(sql = "SELECT Table_Name, concat(CAST(CEIL((Data_length+Index_length)/1024) as char),'kb') as size FROM INFORMATION_SCHEMA.tables WHERE table_schema=?", type = "sql"))
+        @SQLRawSet(
+                value = {
+                    @SQLRaw(sql = "SELECT Table_Name, concat(CAST(CEIL((Data_length+Index_length)/1024) as char),'kb') as size FROM INFORMATION_SCHEMA.tables WHERE table_schema=?", type = "sql"),
+                    @SQLRaw(sql = "SELECT 'SQLite DB' as Table_Name, 'N/A kb' as size", type = "sqlite")
+                }
+        )
         private PreparedStatement getTableInfo;
 
         private Connection con;
