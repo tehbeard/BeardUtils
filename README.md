@@ -31,7 +31,7 @@ of Bukkit's plugin loader. This is for plugins that need to load external option
 The best usecase is BeardAch. BeardAch uses AddonLoader to allow server admins and plugin authors to write custom triggers and rewards for achievements.
 These can be dropped into plugins/BeardAch/addons
 
-###commands
+### commands
 Commands consists of two main components, ArguementPack and CommandHandler.
 
 ArgumentPack is a helper class that parses an argument list to provide boolean and option (string) flags. Leaving the programmer to worry about the action of 
@@ -50,25 +50,25 @@ public static boolean commandFooBar(ArgumentPack pack){
 }
 `
 
-###cuboid
+### cuboid
 Need to map data to a spatial region? Don't want to depend on a protection plugin like WorldGuard? cuboid has you covered.
 Cuboid provides a way to define an area and check if an entity is inside it.
 ChunkCache provides a way to index data by cuboid, and search for it. the result is a list of CuboidEntry's, providing the cuboid and data associated with it.
 CuboidSelector is a helper method that provides code for getting a cuboid object from a player, defined using a configurable "tool" item.
 
-###expressions
+### expressions
 expressions a mechanism for processing an infix expression, it supports +-*/() and powers (^), as well as variables and functions (definable by programmer). 
 It can take a string such as @avg(20,9*(3-$foo)) and evaluate it, producing the value 23 if $foo is 0.
 It includes a number of functions like average,min,max,mod
 
-###factory
+### factory
 Factory makes it simple to automate runtime choices, such as data provider, class, spell etc. 
 Add an annotation to a class, add it to the factory, and you can then pull objects out of it using a string value.
 
-###Session
+### Session
 One class file that lets you store data associated with a player. Register the session object with bukkit's event system, and the session is cleared automatically on logout.
 
-###Syringe
+### Syringe
 This is mainly for more advanced programmers, such as those using the addons and factory packages. It allows you to modify fields in a class based on annotation.
 Uses for this would be to set the field to the value of another addon (see: http://www.sk89q.com/2011/10/how-i-stay-sane-while-updating-my-minecraft-server/ for a better example), or
 even as a way to set configuration values, like so:
