@@ -51,23 +51,26 @@
   
   
   <distributionManagement>
-   <repository>
-     <id>dev-repo</id>
-     <name>dev.escapecraft.com Releases</name>
-     <url>scp://dev.escapecraft.com/var/www/maven</url>
-   </repository>
-   <snapshotRepository>
-     <id>dev-repo-snap</id>
-     <name>dev.escapecraft.com Snapshots</name>
-     <url>scp://dev.escapecraft.com/var/www/maven</url>
-   </snapshotRepository>
-   <site>
-   <id>site</id>
-   <name>http://dev.escapecraft.com/maven/me/tehbeard/utils/</name>
-   <url>scp://dev.escapecraft.com/maven/me/tehbeard/utils/</url>
-   </site>
- </distributionManagement>
+        <repository>
+            <id>dev-repo</id>
+            <name>maven.tehbeard.com Releases</name>
+            <url>sftp://maven.tehbeard.com/repo</url>
+        </repository>
+        <snapshotRepository>
+            <id>dev-repo-snap</id>
+            <name>maven.tehbeard.com Snapshots</name>
+            <url>sftp://maven.tehbeard.com/repo</url>
+        </snapshotRepository>
+    </distributionManagement>
  <build>
+	 <extensions>
+      <!-- Enabling the use of SSH -->
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ssh</artifactId>
+         <version>3.3.3</version>
+      </extension>
+    </extensions>
  </build>
  
  <reporting>
