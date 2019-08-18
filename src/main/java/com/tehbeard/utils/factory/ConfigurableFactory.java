@@ -1,6 +1,7 @@
 package com.tehbeard.utils.factory;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -63,22 +64,33 @@ public abstract class ConfigurableFactory<C, A> {
             } catch (IllegalAccessException e) {
                 throw new IllegalStateException("Could not create instance of the object due to an access exception");
 
+            } catch (IllegalArgumentException e) {
+                throw new IllegalStateException("Could not create instance of the object due to an illegal argument exception");
+            } catch (InvocationTargetException e) {
+                throw new IllegalStateException("Could not create instance of the object due to an Invocation target exception");
+            } catch (NoSuchMethodException e) {
+                throw new IllegalStateException("Could not create instance of the object due to an no such method exception");
+            } catch (SecurityException e) {
+                throw new IllegalStateException("Could not create instance of the object due to a security exception");
             }
         }
         return null;
     }
 
     /**
-     * Method that produces products, override to change initialisation
-     * behaviour
+     * Method that produces products, override to change initialisation behaviour
      * 
      * @param tag
      * @return
      * @throws InstantiationException
      * @throws IllegalAccessException
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      */
-    protected C produce(String tag) throws InstantiationException, IllegalAccessException {
-        return this.products.get(tag).newInstance();
+    protected C produce(String tag) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        return this.products.get(tag).getConstructor().newInstance();
     }
 
     /**
