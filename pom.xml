@@ -8,19 +8,23 @@
   <description>
   
   </description>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
   <repositories>
     <!-- Repository for Bukkit -->
       <repository>
-        <id>bukkit-repo</id>
-        <url>http://repo.bukkit.org/content/groups/public/</url>
-      </repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+        </repository>
    </repositories>
   <dependencies>
-  	<!-- --><dependency>
-  		<groupId>org.bukkit</groupId>
-  		<artifactId>bukkit</artifactId>
-  		<version>1.7.2-R0.3</version>
-  	</dependency><!-- -->
+  	<dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.8-R0.1-SNAPSHOT</version>
+        </dependency>
   	
   	<dependency>
 			<groupId>junit</groupId>
@@ -51,23 +55,26 @@
   
   
   <distributionManagement>
-   <repository>
-     <id>dev-repo</id>
-     <name>dev.escapecraft.com Releases</name>
-     <url>scp://dev.escapecraft.com/var/www/maven</url>
-   </repository>
-   <snapshotRepository>
-     <id>dev-repo-snap</id>
-     <name>dev.escapecraft.com Snapshots</name>
-     <url>scp://dev.escapecraft.com/var/www/maven</url>
-   </snapshotRepository>
-   <site>
-   <id>site</id>
-   <name>http://dev.escapecraft.com/maven/me/tehbeard/utils/</name>
-   <url>scp://dev.escapecraft.com/maven/me/tehbeard/utils/</url>
-   </site>
- </distributionManagement>
+        <repository>
+            <id>dev-repo</id>
+            <name>maven.tehbeard.com Releases</name>
+            <url>sftp://maven.tehbeard.com/repo</url>
+        </repository>
+        <snapshotRepository>
+            <id>dev-repo-snap</id>
+            <name>maven.tehbeard.com Snapshots</name>
+            <url>sftp://maven.tehbeard.com/repo</url>
+        </snapshotRepository>
+    </distributionManagement>
  <build>
+	 <extensions>
+      <!-- Enabling the use of SSH -->
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ssh</artifactId>
+         <version>3.3.3</version>
+      </extension>
+    </extensions>
  </build>
  
  <reporting>

@@ -38,7 +38,6 @@ public final class InvMenu implements InventoryHolder, Listener {
         return this.inv;
     }
 
-    @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent event) {
         if (event.getInventory().getHolder() != this) {
@@ -52,7 +51,6 @@ public final class InvMenu implements InventoryHolder, Listener {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPaintEvent(InventoryDragEvent event) {
         if (event.getInventory().getHolder() != this) {
