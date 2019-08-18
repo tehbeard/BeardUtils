@@ -67,8 +67,8 @@ public class BungeeCordChannelInterface implements PluginMessageListener {
             bbd.writeUTF("ConnectOther");
             bbd.writeUTF(player);
             bbd.writeUTF(serverName);
-            if (Bukkit.getOnlinePlayers().length > 0) {
-                Bukkit.getOnlinePlayers()[0].sendPluginMessage(plugin, "BungeeCord", bbd.toByteArray());
+            if (Bukkit.getOnlinePlayers().size() > 0) {
+                Bukkit.getOnlinePlayers().iterator().next().sendPluginMessage(plugin, "BungeeCord", bbd.toByteArray());
             }
         } catch (IOException ex) {
             Logger.getLogger(BungeeCordChannelInterface.class.getName()).log(Level.SEVERE, null, ex);
@@ -81,8 +81,8 @@ public class BungeeCordChannelInterface implements PluginMessageListener {
             bbd.writeUTF("Message");
             bbd.writeUTF(player);
             bbd.writeUTF(message);
-            if (Bukkit.getOnlinePlayers().length > 0) {
-                Bukkit.getOnlinePlayers()[0].sendPluginMessage(plugin, "BungeeCord", bbd.toByteArray());
+            if (Bukkit.getOnlinePlayers().size() > 0) {
+                Bukkit.getOnlinePlayers().iterator().next().sendPluginMessage(plugin, "BungeeCord", bbd.toByteArray());
             }
         } catch (IOException ex) {
             Logger.getLogger(BungeeCordChannelInterface.class.getName()).log(Level.SEVERE, null, ex);
@@ -98,8 +98,8 @@ public class BungeeCordChannelInterface implements PluginMessageListener {
 
             out.writeShort(data.length);
             out.write(data);
-            if (Bukkit.getOnlinePlayers().length > 0) {
-                Bukkit.getOnlinePlayers()[0].sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+            if (Bukkit.getOnlinePlayers().size() > 0) {
+                Bukkit.getOnlinePlayers().iterator().next().sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
             }
         } catch (IOException ex) {
             Logger.getLogger(BungeeCordChannelInterface.class.getName()).log(Level.SEVERE, null, ex);
